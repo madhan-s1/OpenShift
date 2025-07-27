@@ -1,0 +1,121 @@
+---
+# tasks file for ocp_gitops
+
+- name: ocp_gitops | ocp_gitops_cluster-config_apps_validation_customcerts.yaml | Openshift Gitops - Get Custom certs application status
+  kubernetes.core.k8s_info:
+    host: "{{ ocp_gitops_openshift_host }}"
+    validate_certs: no
+    api_version: argoproj.io/v1alpha1
+    kind: Application
+    name: config-customcerts
+    namespace: openshift-gitops
+    validate_certs: no
+  register: ocp_gitops_application_status
+  until: ocp_gitops_application_status.resources[0].status.health.status is defined
+  retries: 3
+  delay: 5
+
+- name: ocp_gitops | ocp_gitops_cluster-config_apps_validation_customcerts.yaml | Openshift Gitops - Wait 10sec before checking Custom certs application status
+  ansible.builtin.pause:
+    seconds: 10
+
+- name: ocp_gitops | ocp_gitops_cluster-config_apps_validation_customcerts.yaml | Openshift Gitops - Get Custom certs application status
+  kubernetes.core.k8s_info:
+    host: "{{ ocp_gitops_openshift_host }}"
+    validate_certs: no
+    api_version: argoproj.io/v1alpha1
+    kind: Application
+    name: config-customcerts
+    namespace: openshift-gitops
+    validate_certs: no
+  register: ocp_gitops_application_status
+  until: ocp_gitops_application_status.resources[0].status.health.status == "Healthy"
+  retries: 6
+  delay: 10
+
+- name: ocp_gitops | ocp_gitops_cluster-config_apps_validation_customcerts.yaml | Openshift Gitops - Check Custom certs application status
+  ansible.builtin.assert:
+    that:
+      - ocp_gitops_application_status.resources[0].status.health.status == "Healthy"
+    fail_msg: "Custom certs application not Healthy"
+    success_msg: "Custom certs application Healthy"
+
+- name: ocp_gitops | ocp_gitops_cluster-config_apps_validation_customcerts.yaml | Openshift Gitops - Wait 2min for the start of ClusterOperator authentication update
+  ansible.builtin.pause:
+    minutes: 2
+
+- name: ocp_gitops | ocp_gitops_cluster-config_apps_validation_customcerts.yaml | Openshift Gitops - Wait until ClusterOperator authentication status is good
+  ansible.builtin.shell: |
+    oc get co authentication -o=jsonpath='{.status.conditions[?(@.type=="Degraded")].status},{.status.conditions[?(@.type=="Degraded")].status},{.status.conditions[?(@.type=="Degraded")].message}'
+  register: ocp_gitops_cluster_operator_status
+  until: ocp_gitops_cluster_operator_status.stdout == "False,False,All is well"
+  retries: 40
+  delay: 30
+
+- name: ocp_gitops | ocp_gitops_cluster-config_apps_validation_customcerts.yaml | Openshift Gitops - Wait until ClusterOperator kube-apiserver status is good
+  ansible.builtin.shell: |
+    oc get co kube-apiserver -o=jsonpath='{.status.conditions[?(@.type=="Degraded")].status},{.status.conditions[?(@.type=="Degraded")].status}'
+  register: ocp_gitops_cluster_operator_status
+  until: ocp_gitops_cluster_operator_status.stdout == "False,False"
+  retries: 20
+  delay: 30
+
+- name: ocp_gitops | ocp_gitops_cluster-config_apps_validation_customcerts.yaml | Openshift Gitops - Get ClusterOperator authentication status
+  kubernetes.core.k8s_info:
+    host: "{{ ocp_gitops_openshift_host }}"
+    validate_certs: no
+    api_version: v1
+    kind: ClusterOperator
+    name: authentication
+    validate_certs: no
+  register: ocp_gitops_cluster_operator_status
+
+- name: ocp_gitops | ocp_gitops_cluster-config_apps_validation_customcerts.yaml | Openshift Gitops -  Check ClusterOperator authentication status
+  when: item.type == "Degraded"
+  ansible.builtin.assert:
+    that:
+      - item.status == "False"
+    fail_msg: "Authentication cluster operator Degraded"
+    success_msg: "Authentication cluster operator Healthy"
+  loop: "{{ ocp_gitops_cluster_operator_status.resources[0].status.conditions }}"
+
+- name: ocp_gitops | ocp_gitops_cluster-config_apps_validation_customcerts.yaml | Openshift Gitops - Get ClusterOperator kube-apiserver status
+  kubernetes.core.k8s_info:
+    host: "{{ ocp_gitops_openshift_host }}"
+    validate_certs: no
+    api_version: v1
+    kind: ClusterOperator
+    name: kube-apiserver
+    validate_certs: no
+  register: ocp_gitops_cluster_operator_status
+
+- name: ocp_gitops | ocp_gitops_cluster-config_apps_validation_customcerts.yaml | Openshift Gitops -  Check ClusterOperator kube-apiserver status
+  when: item.type == "Degraded"
+  ansible.builtin.assert:
+    that:
+      - item.status == "False"
+    fail_msg: "kube-apiserver cluster operator Degraded"
+    success_msg: "kube-apiserver cluster operator Healthy"
+  loop: "{{ ocp_gitops_cluster_operator_status.resources[0].status.conditions }}"
+
+- name: ocp_gitops | ocp_gitops_cluster-config_apps_validation_customcerts.yaml | Openshift Gitops - Wait till router pods of default ingress controller are running on infra nodes
+  kubernetes.core.k8s_info:
+    host: "{{ ocp_gitops_openshift_host }}"
+    validate_certs: no
+    kind: Pod
+    label_selectors:
+      - ingresscontroller.operator.openshift.io/deployment-ingresscontroller=default
+    namespace: openshift-ingress
+    wait: yes
+    wait_sleep: 10
+    wait_timeout: 360
+  #when: ocp_gitops_environment != "engg-1"
+  register: ocp_gitops_pod_status
+  until:
+    - ocp_gitops_pod_status.resources[0].spec.nodeName is search ('infra')
+    - ocp_gitops_pod_status.resources[1].spec.nodeName is search ('infra')
+    - ocp_gitops_pod_status.resources[2].spec.nodeName is search ('infra')
+  retries: 12
+  delay: 10
+
+

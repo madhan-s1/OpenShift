@@ -1,0 +1,98 @@
+defaultingress: ingressgateway
+defaultegress: egressgateway
+manageNetworkPolicy: true
+loglevel: warn
+
+members:
+  - ws-b2c-sandbox-2
+  - ws-b2c-sandbox-3
+  - ws-b2b-unit-edge
+  - ws-b2b-unit-domain
+  - ws-b2c-unit-edge
+  - ws-b2c-unit-domain
+  - ws-op-unit-domain
+  - ws-ivr-unit-domain
+  - ws-ivr-unit-edge
+  - ws-vpc-unit-domain
+  - ws-vpc-unit-edge
+  - ws-mpm-unit-domain
+  - ws-mdm-unit-edge
+  - ws-mdm-unit-domain
+  - ws-hcentral-unit-domain
+  - ws-tms-unit
+  - ws-hav-unit-domain
+  - ws-sav-unit-domain
+  - ws-gnl-unit-domain
+  - ws-clmptb-unit-domain
+  - ws-vpa-unit-domain
+  - ws-gpd-unit-domain
+  - ws-esl-unit-domain
+  - ws-rwm-api-unit
+  - ws-b2bpais-unit-domain
+  - ws-swift-unit-domain
+  - ws-pnc-unit
+  - ws-ems-unit-domain
+  - ws-accon-unit-domain
+  - ws-caseupdt-unit-domain
+  - ws-isva-core
+  - ws-isva-unit-int
+  - ws-isva-unit-int-b
+  - ws-isva-unit-int-g
+  - ws-b2b-admin-unit-edge
+  - ws-fdtpa-unit-domain
+  - ws-ops-unit-edge
+  - ws-fndops-unit-edge
+  - ws-bko-unit-edge
+  - ws-fndops-unit-domain
+  - ws-sec-unit-edge
+  - ws-bko-unit-domain
+  - ws-ops-unit-domain
+disableJaeger: true
+
+smcpVersion: v2.6
+
+wildcardDomains:
+  - name: unit
+    domain: unit.sm.apps.strl-ocp-unit-1.unit.apptoapp.net
+
+routetimeout: 120s
+routeloadbalance: true
+
+istiod:
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "1Gi"
+  autoScaling:
+    minReplicas: 2
+    maxReplicas: 4
+
+additionalIngress:
+  - shortid: unit
+    resources:
+      cpu: 300m
+      memory: 1Gi
+    limits:
+      cpu: 1
+      memory: 1500Mi
+    autoScaling:
+      minReplicas: 2
+      maxReplicas: 4
+
+dnsName: "apps.strl-ocp-unit-1.unit.apptoapp.net"
+appGroupNames:
+  - G-OCP-B2C-NonProd
+  - G-OCP-B2B-NonProd
+  - G-OCP-EB-NonProd
+  - G-OCP-CORP-NonProd
+  - G-OCP-APPOPS
+  - G-OCP-IVR-NonProd
+  - G-OCP-HCENTRAL-NonProd
+  - G-OCP-EDPSHARED-NonProd-AppAdmin
+  - G-OCP-EDPSHARED-NonProd
+  - G-OCP-ISVAINT-NProd
+  - G-OCP-OPS-NonProd
+  - G-OCP-FNDOPS-NonProd
+  - G-OCP-BKO-NonProd
+  - G-OCP-SEC-NonProd
+

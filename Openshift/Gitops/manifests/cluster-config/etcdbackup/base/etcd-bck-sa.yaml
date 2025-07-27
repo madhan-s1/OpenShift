@@ -1,0 +1,11 @@
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+  name: openshift-backup
+  namespace: ocp-backup-etcd
+  labels:
+    app: openshift-backup
+
+

@@ -1,0 +1,43 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+bases:
+- ws-b2b-intg-domain
+- ws-b2b-intg-edge
+- ws-b2c-intg-domain
+- ws-b2c-intg-edge
+- ws-op-intg-domain
+- ws-ivr-intg-domain
+- ws-ivr-intg-edge
+- ws-vpc-intg-domain
+- ws-vpc-intg-edge
+- ws-mpm-intg-domain
+#- ws-mdm-intg-edge
+- ws-mdm-intg-domain
+- ws-hcentral-intg-domain
+- ws-tms-intg
+- ws-hav-intg-domain
+- ws-sav-intg-domain
+- ws-gnl-intg-domain
+- ws-clmptb-intg-domain
+- ws-vpa-intg-domain
+- ws-gpd-intg-domain
+- ws-esl-intg-domain
+- ws-rwm-api-intg
+- ws-b2bpais-intg-domain
+- ws-swift-intg-domain
+- ws-pnc-intg
+- ws-ems-intg-domain
+- ws-accon-intg-domain
+- ws-caseupdt-intg-domain
+- ws-b2b-admin-intg-edge
+- ws-fdtpa-intg-domain
+- ws-erp-intg-batch
+- ws-ops-intg-edge
+- ws-fndops-intg-edge
+- ws-bko-intg-edge
+- ws-sec-intg-edge
+- ws-bko-intg-domain
+- ws-ops-intg-domain
+- ws-fndops-intg-domain
+

@@ -1,0 +1,87 @@
+---
+# tasks file for ocp_gitops
+
+- debug:
+    msg: "Openshift Gitops - Checking requirements"
+
+- pause:
+    seconds: 5
+
+- name: ocp_validation | main.yaml | Validate ansible collections
+  ansible.builtin.shell: |
+    ansible-galaxy collection install community.okd
+    ansible-galaxy collection install kubernetes.core
+
+- name: ocp_gitops | main.yaml | Including requirements
+  ansible.builtin.include_tasks:
+    file: ocp_gitops_requirements.yaml
+
+- debug:
+    msg: "Openshift Gitops - Operator installation"
+
+- pause:
+    seconds: 5
+
+- name: ocp_gitops | main.yaml | Openshift-Gitops installation
+  ansible.builtin.include_tasks:
+    file: ocp_gitops_installation.yaml
+
+- debug:
+    msg: "Openshift Gitops - Operator configuration"
+
+- pause:
+    seconds: 5
+
+- name: ocp_gitops | main.yaml | Openshift-Gitops configuration
+  ansible.builtin.include_tasks:
+    file: ocp_gitops_configuration.yaml
+
+- debug:
+    msg: "Openshift Gitops - Start creating namespace-config applications"
+  when:
+    - "'rhacm' not in ocp_gitops_environment"
+    #- "'engg-1' not in ocp_gitops_environment"
+
+- pause:
+    seconds: 10
+  when:
+    - "'rhacm' not in ocp_gitops_environment"
+    #- "'engg-1' not in ocp_gitops_environment"
+
+- name: ocp_gitops | main.yaml | Openshift-Gitops namespace-config applications
+  when:
+    - "'rhacm' not in ocp_gitops_environment"
+    #- "'engg-1' not in ocp_gitops_environment"
+  ansible.builtin.include_tasks:
+    file: ocp_gitops_namespace-config_apps.yaml
+
+- debug:
+    msg: "Openshift Gitops - Start creating cluster-config applications"
+
+- pause:
+    seconds: 10
+
+- name: ocp_gitops | main.yaml | Openshift-Gitops cluster-config applications
+  ansible.builtin.include_tasks:
+    file: ocp_gitops_cluster-config_apps.yaml
+
+- debug:
+    msg: "Openshift Gitops - Start creating network-policies-config applications"
+  when:
+    - "'rhacm' not in ocp_gitops_environment"
+    - "'engg-1' not in ocp_gitops_environment"
+
+- pause:
+    seconds: 10
+  when:
+    - "'rhacm' not in ocp_gitops_environment"
+    - "'engg-1' not in ocp_gitops_environment"
+
+- name: ocp_gitops | main.yaml | Openshift-Gitops network-policies-config applications
+  ansible.builtin.include_tasks:
+    file: ocp_gitops_network-policies-config_apps.yaml
+  when:
+    - "'rhacm' not in ocp_gitops_environment"
+    - "'engg-1' not in ocp_gitops_environment"
+
+

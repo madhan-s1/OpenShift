@@ -1,0 +1,159 @@
+{{- if not .Values.manageNetworkPolicy }}
+
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: istio-expose-route-ossm-controlplane
+  namespace: istio-system
+spec:
+  podSelector:
+    matchLabels:
+      maistra.io/expose-route: 'true'
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              network.openshift.io/policy-group: ingress
+  policyTypes:
+    - Ingress
+
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: istio-mesh-ossm-controlplane
+  namespace: istio-system
+spec:
+  podSelector: {}
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              maistra.io/member-of: istio-system
+  policyTypes:
+    - Ingress
+
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: istio-grafana-ingress
+  namespace: istio-system
+spec:
+  podSelector:
+    matchLabels:
+      app: grafana
+  ingress:
+    - {}
+  policyTypes:
+    - Ingress
+
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: istio-kiali-ingress
+  namespace: istio-system
+spec:
+  podSelector:
+    matchLabels:
+      app: kiali
+  ingress:
+    - {}
+  policyTypes:
+    - Ingress
+
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: istio-prometheus-ingress
+  namespace: istio-system
+spec:
+  podSelector:
+    matchLabels:
+      app: prometheus
+  ingress:
+    - {}
+  policyTypes:
+    - Ingress
+
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: istio-ingressgateway
+  namespace: istio-system
+spec:
+  podSelector:
+    matchLabels:
+      app: istio-ingressgateway
+      istio: ingressgateway
+  ingress:
+    - {}
+  policyTypes:
+    - Ingress
+
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: istio-istiod-ossm-controlplane
+  namespace: istio-system
+spec:
+  podSelector:
+    matchLabels:
+      app: istiod
+      istio.io/rev: ossm-controlplane
+  ingress:
+    - {}
+  policyTypes:
+    - Ingress
+
+---
+{{- if .Values.additionalIngress}}
+{{- range $ingress := .Values.additionalIngress }}
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: istio-ingressgateway-{{ $ingress.shortid }}
+  namespace: istio-system
+spec:
+  podSelector:
+    matchLabels:
+      app: istio-ingressgateway-{{ $ingress.shortid }}
+      istio: ingressgateway-{{ $ingress.shortid }}
+  ingress:
+    - {}
+  policyTypes:
+    - Ingress
+---
+{{- end }}
+{{- end }}
+
+---
+{{- if .Values.ossmFederation }}
+{{- if .Values.ossmFederation.additionalGateways }}
+{{- range $ingress := .Values.ossmFederation.additionalGateways }}
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: ingress-{{ $ingress.name }}-mesh
+  namespace: istio-system
+spec:
+  podSelector:
+    matchLabels:
+      app: ingress-{{ $ingress.name }}-mesh
+      federation.maistra.io/ingress-for: ingress-{{ $ingress.name }}-mesh
+      istio: ingressgateway
+  ingress:
+    - {}
+  policyTypes:
+    - Ingress
+---
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{- end }}
+

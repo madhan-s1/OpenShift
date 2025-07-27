@@ -1,0 +1,325 @@
+apiVersion: maistra.io/v2
+kind: ServiceMeshControlPlane
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "6"
+  finalizers:
+  - maistra.io/istio-operator
+  name: ossm-controlplane
+  namespace: istio-system
+spec:
+  {{- if .Values.ossmFederation }}
+  cluster:
+    name: {{ .Values.ossmFederation.trustDomain }}
+  {{- end }}
+  security:
+    # dataPlane:
+    #   automtls: true
+    # controlPlane: {}
+    # identity:
+    #   type: ThirdParty
+    #   thirdParty:
+    #     issuer: ""
+    #     audience: istio-ca
+    manageNetworkPolicy: {{ .Values.manageNetworkPolicy }}
+    {{- if .Values.ossmFederation }}
+    trust:
+      domain: {{ .Values.ossmFederation.trustDomain }}-mesh.local
+    {{- end }}
+    jwksResolverCA: |
+      {{- .Files.Get "extra-cacerts/cacert.crt" | nindent 8}}
+  addons:
+    grafana:
+      enabled: true
+    {{- if .Values.disableJaeger }}
+    {{- else }}
+    jaeger:
+      install:
+        storage:
+          type: Memory
+      name: jaeger
+    {{- end }}
+    kiali:
+      enabled: true
+      install:
+        deployment:
+          nodeSelector:
+            node-role.kubernetes.io/infra: ""
+          tolerations:
+          - effect: NoSchedule
+            key: node-role.kubernetes.io/infra
+            operator: Exists
+      name: kiali
+    prometheus:
+      enabled: true
+  tracing:
+    type: None
+  gateways:
+    egress:
+      enabled: true
+      service:
+          metadata:
+            annotations:
+              service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+            labels:
+              istio: {{ .Values.defaultegress}}
+              app: "istio-{{ .Values.defaultegress}}"
+      runtime:
+        deployment:
+          autoScaling:
+            enabled: false
+        pod:
+          nodeSelector:
+            node-role.kubernetes.io/infra: ""
+          tolerations:
+          - effect: NoExecute
+            key: node-role.kubernetes.io/infra
+            operator: Equal
+          - effect: NoSchedule
+            key: node-role.kubernetes.io/infra
+            operator: Equal
+      service: {}
+    ingress:
+      enabled: true
+      {{- if eq .Values.smcpVersion "v2.3"}}
+      sds:
+        enabled: true
+      {{- end }}
+      runtime:
+        deployment:
+          autoScaling:
+            enabled: false
+        pod:
+          nodeSelector:
+            node-role.kubernetes.io/infra: ""
+          tolerations:
+          - effect: NoExecute
+            key: node-role.kubernetes.io/infra
+            operator: Equal
+          - effect: NoSchedule
+            key: node-role.kubernetes.io/infra
+            operator: Equal
+      service:
+        metadata:
+            labels:
+              istio: {{ .Values.defaultingress}}
+              app: "istio-{{ .Values.defaultingress}}"
+    {{- if or .Values.additionalIngress .Values.ossmFederation }}
+    additionalIngress:
+    {{- if .Values.ossmFederation }}
+    {{- if .Values.ossmFederation.additionalGateways }}
+      {{- range $ingress := .Values.ossmFederation.additionalGateways }}
+      ingress-{{ $ingress.name }}-mesh:
+        enabled: true
+        routerMode: sni-dnat
+        service:
+          metadata:
+            labels:
+              federation.maistra.io/ingress-for: ingress-{{ $ingress.name }}-mesh
+          ports:
+          - port: 15443
+            name: tls
+          - port: 8188
+            name: https-discovery
+          type: NodePort
+        runtime:
+          container:
+            resources:
+              requests:
+                cpu: 100m
+                memory: 128Mi
+          deployment:
+            autoScaling:
+              enabled: false
+          pod:
+            nodeSelector:
+              node-role.kubernetes.io/infra: ''
+            tolerations:
+              - effect: NoSchedule
+                key: node-role.kubernetes.io/infra
+                operator: Exists
+      {{- end }}
+    {{- end }}
+    {{- end }}
+      {{- range $ingress := .Values.additionalIngress }}
+      istio-ingressgateway-{{ $ingress.shortid }}:
+        enabled: true
+        service:
+          metadata:
+            labels:
+              istio: ingressgateway-{{ $ingress.shortid }}
+              app: istio-ingressgateway-{{ $ingress.shortid }}
+        runtime:
+          container:
+            resources:
+              requests:
+              {{- if $ingress.resources }}
+                cpu: {{ $ingress.resources.cpu | default "100m" }}
+                memory: {{ $ingress.resources.memory | default "128Mi" }}
+              {{- end }}
+              {{- if $ingress.limits }}
+              limits:
+                cpu: {{ $ingress.limits.cpu }}
+                memory: {{ $ingress.limits.memory }}
+              {{- end }}
+          deployment:
+            autoScaling:
+            {{- if $ingress.autoScaling }}
+              enabled: true
+              minReplicas: {{ $ingress.autoScaling.minReplicas }}
+              maxReplicas: {{ $ingress.autoScaling.maxReplicas }}
+              targetCPUUtilizationPercentage: {{ $ingress.autoScaling.targetCPUUtilizationPercentage | default 80 }}
+            {{- else }}
+              enabled: false
+            {{- end }}
+          pod:
+            nodeSelector:
+              node-role.kubernetes.io/infra: ''
+            tolerations:
+              - effect: NoSchedule
+                key: node-role.kubernetes.io/infra
+                operator: Exists
+      {{- end }}
+    {{- end }}
+    {{- if or .Values.additionalEgress .Values.ossmFederation }}
+    additionalEgress:
+    {{- if .Values.ossmFederation }}
+    {{- if .Values.ossmFederation.additionalGateways }}
+      {{- range $egress := .Values.ossmFederation.additionalGateways }}
+      egress-{{ $egress.name }}-mesh:
+        enabled: true
+        routerMode: sni-dnat
+        requestedNetworkView:
+        - {{ $egress.name }}-mesh-network
+        service:
+          metadata:
+            labels:
+              federation.maistra.io/egress-for: egress-{{ $egress.name }}-mesh
+          ports:
+          - port: 15443
+            name: tls
+          - port: 8188
+            name: http-discovery
+        runtime:
+          container:
+            resources:
+              requests:
+                cpu: 100m
+                memory: 128Mi
+          deployment:
+            autoScaling:
+              enabled: false
+          pod:
+            nodeSelector:
+              node-role.kubernetes.io/infra: ''
+            tolerations:
+              - effect: NoSchedule
+                key: node-role.kubernetes.io/infra
+                operator: Exists
+      {{- end }}
+    {{- end }}
+    {{- end }}
+      {{- range $egress := .Values.additionalEgress }}
+      istio-egressgateway-{{ $egress.shortid }}:
+        enabled: true
+        service:
+          metadata:
+            labels:
+              istio: egressgateway-{{ $egress.shortid }}
+              app: istio-egressgateway-{{ $egress.shortid }}
+        runtime:
+          container:
+            resources:
+              requests:
+              {{- if $egress.resources }}
+                cpu: {{ $egress.resources.cpu | default "100m" }}
+                memory: {{ $egress.resources.memory | default "128Mi" }}
+              {{- end }}
+          deployment:
+            autoScaling:
+            {{- if $egress.autoScaling }}
+              enabled: true
+              minReplicas: {{ $egress.autoScaling.minReplicas }}
+              maxReplicas: {{ $egress.autoScaling.maxReplicas }}
+              targetCPUUtilizationPercentage: {{ $egress.autoScaling.targetCPUUtilizationPercentage | default 80 }}
+            {{- else }}
+              enabled: false
+            {{- end }}
+          pod:
+            nodeSelector:
+              node-role.kubernetes.io/infra: ''
+            tolerations:
+              - effect: NoSchedule
+                key: node-role.kubernetes.io/infra
+                operator: Exists
+      {{- end }}
+    {{- end }}
+    openshiftRoute:
+      enabled: false
+  profiles:
+  - default
+  general:
+    logging:
+      componentLevels:
+        default: {{ .Values.loglevel}}
+      logAsJSON: false
+    validationMessages: true
+  proxy:
+    injection:
+      autoInject: true
+    logging:
+      level: {{ .Values.loglevel}}
+    runtime:
+      container:
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "256Mi"
+  runtime:
+    components:
+      grafana:
+        pod:
+          nodeSelector:
+            node-role.kubernetes.io/infra: ""
+          tolerations:
+          - effect: NoSchedule
+            key: node-role.kubernetes.io/infra
+            operator: Exists
+      pilot:
+        pod:
+          nodeSelector:
+            node-role.kubernetes.io/infra: ""
+          tolerations:
+          - effect: NoSchedule
+            key: node-role.kubernetes.io/infra
+            operator: Exists
+      {{- if .Values.istiod }}
+      {{- if .Values.istiod.resources }}
+        container:
+          resources:
+            requests:
+              cpu: {{ .Values.istiod.resources.requests.cpu }}
+              memory: {{ .Values.istiod.resources.requests.memory }}
+      {{- end }}
+        deployment:
+          autoScaling:
+          {{- if .Values.istiod.autoScaling }}
+            enabled: true
+            minReplicas: {{ .Values.istiod.autoScaling.minReplicas }}
+            maxReplicas: {{ .Values.istiod.autoScaling.maxReplicas }}
+            targetCPUUtilizationPercentage: {{ .Values.istiod.autoScaling.targetCPUUtilizationPercentage | default 70 }}
+          {{- else }}
+            enabled: false
+          {{- end }}
+      {{- end }}
+      prometheus:
+        pod:
+          nodeSelector:
+            node-role.kubernetes.io/infra: ""
+          tolerations:
+          - effect: NoSchedule
+            key: node-role.kubernetes.io/infra
+            operator: Exists
+  version: {{ .Values.smcpVersion | default "v2.2" }}
+
+

@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: config-cert-manager
+  namespace: openshift-gitops
+spec:
+  destination:
+    namespace: openshift-gitops
+    server: https://kubernetes.default.svc
+  project: cluster-config
+  source:
+    path: Gitops/manifests/cluster-config/cert-manager
+    repoURL: https://github.com/madhan-s1/OpenShift
+    targetRevision: master
+    helm:
+      releaseName: cert-manager
+      valueFiles:
+        - values.yaml
+        - values-prod-1.yaml
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+  ignoreDifferences:
+    - kind: Secret
+      name: venafi-tpp-secret
+      namespace: cert-manager
+      jsonPointers:
+        - /data

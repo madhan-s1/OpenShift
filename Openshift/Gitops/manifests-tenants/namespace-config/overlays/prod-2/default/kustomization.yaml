@@ -1,0 +1,11 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- namespace-default.yaml
+- service-account-xldeploy.yaml
+- service-account-servicenow.yaml
+- edit-xldeploy.yaml
+- cluster-reader-servicenow.yaml
+
+

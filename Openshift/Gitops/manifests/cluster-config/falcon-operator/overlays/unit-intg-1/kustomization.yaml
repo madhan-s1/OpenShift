@@ -1,0 +1,37 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base
+
+patches:
+  - target:
+      kind: FalconNodeSensor
+      name: falcon-node-sensor
+    patch: |-
+      - op: replace
+        path: /spec/node/image
+        value: 'artifactory.qubit.net/azimages-dev-local/falcon-sensor/us-1/release/falcon-sensor:7.24.0-17706-1.falcon-linux.Release.US-1'
+      - op: replace
+        path: /spec/node/backend
+        value: 'bpf'
+  - target:
+      kind: Subscription
+      name: falcon-operator
+    patch: |-
+      - op: replace
+        path: /spec/source
+        value: 'certified-operators'
+      - op: replace
+        path: /spec/channel
+        value: 'certified-1.0'
+      - op: replace
+        path: /spec/name
+        value: 'falcon-operator'
+  - target:
+      kind: OperatorGroup
+      name: falcon-operator
+    patch: |-
+      - op: replace
+        path: /spec
+        value: {}

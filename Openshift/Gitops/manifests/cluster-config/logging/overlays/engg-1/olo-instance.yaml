@@ -1,0 +1,35 @@
+apiVersion: logging.openshift.io/v1
+kind: ClusterLogging
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "6"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+  name: instance
+  namespace: openshift-logging
+spec:
+  managementState: Managed
+  #logStore:
+    # lokistack:
+    #   name: lokistack
+    #   nodeCount: 3
+    #   nodeSelector:
+    #     node-role.kubernetes.io/infra: ""
+    #   tolerations:
+    #   - effect: NoSchedule
+    #     key: node-role.kubernetes.io/infra
+    #     operator: Exists              
+    # retentionPolicy:
+    #   application:
+    #     maxAge: 2d
+    #   audit:
+    #     maxAge: 2d
+    #   infra:
+    #     maxAge: 2d
+    # type: lokistack
+  collection:
+    tolerations:
+      - effect: NoSchedule
+        operator: Exists
+    type: vector
+
+

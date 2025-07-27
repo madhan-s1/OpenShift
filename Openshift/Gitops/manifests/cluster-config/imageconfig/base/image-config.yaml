@@ -1,0 +1,41 @@
+apiVersion: config.openshift.io/v1
+kind: Image
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+  name: cluster
+spec:
+  additionalTrustedCA:
+    name: registry-cas
+  registrySources:
+    allowedRegistries:
+      - registry.k8s.io
+      - artifactory.qubit.net
+      - quay.io
+      - cdn01.quay.io
+      - cdn02.quay.io
+      - cdn03.quay.io
+      - cdn.quay.io
+      - access.redhat.com
+      - sso.redhat.com
+      - registry.redhat.io
+      - cloudfront.net
+      - registry.connect.redhat.com
+      - image-registry.openshift-image-registry.svc:5000
+      - registry.example.com:5000
+      - rcm85522.live.dynatrace.com/linux/activegate:latest
+      - rcm85522.live.dynatrace.com/linux/oneagent:1.307.61
+      - hdc77104.live.dynatrace.com/linux/activegate:latest
+      - hdc77104.live.dynatrace.com/linux/oneagent:latest
+      - cru25885.live.dynatrace.com/linux/activegate:latest
+      - cru25885.live.dynatrace.com/linux/oneagent:latest
+      - server-108-156-152-56.atl58.r.cloudfront.net
+      - server-99-84-252-55.mia3.r.cloudfront.net
+      - server-108-156-152-77.atl58.r.cloudfront.net
+      - hkv68108.live.dynatrace.com/linux/activegate:latest
+      - hkv68108.live.dynatrace.com/linux/oneagent:latest
+      - hkv68108.live.dynatrace.com/api
+      - registry.crowdstrike.com
+      - mcr.microsoft.com
+      - icr.io
+      - gcr.io

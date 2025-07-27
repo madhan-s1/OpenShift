@@ -1,0 +1,41 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- infra-machineset.yaml
+- hugepages.yaml
+- worker-machineset.yaml
+- apigee-data-machineset.yaml
+- apigee-runtime-machineset.yaml
+- cert-manager-operator.yaml
+- cert-manager.yaml
+- customcerts.yaml
+- ingress-controller-sharding.yaml  
+- storage-classes.yaml
+- self-provisioner.yaml
+- monitoring.yaml
+- ldapidentityprovider.yaml
+- ldapgroupsync.yaml
+- imageregistry.yaml
+- imageconfig.yaml
+- logging.yaml
+- logforwardingsplunk.yaml
+- falcon-operator.yaml
+- crowdstrike-kpagent.yaml
+- dynatrace.yaml
+- etcdbackup.yaml
+- conjur.yaml
+- conjur-app-ns.yaml
+- servicemesh.yaml
+- sm-controlplane.yaml 
+- autoscaler.yaml
+- hugepages-1.yaml
+- csi-driver-smb.yaml
+- worker-mft-machineset.yaml
+- worker-1-machineset.yaml
+- worker-2-machineset.yaml
+- infra-machineset-loki.yaml
+- dynatrace.yaml
+- worker-guardium-machineset.yaml
+- machineconfigs.yaml
+

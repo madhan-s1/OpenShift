@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ocp-backup-etcd
+  labels:
+    app: openshift-backup
+    argocd.argoproj.io/managed-by: openshift-gitops
+  annotations:
+    openshift.io/node-selector: ""
+    argocd.argoproj.io/sync-wave: "1"
+
+

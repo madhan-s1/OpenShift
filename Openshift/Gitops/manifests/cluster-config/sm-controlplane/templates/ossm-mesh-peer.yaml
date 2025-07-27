@@ -1,0 +1,32 @@
+{{- if .Values.ossmFederation }}
+{{- range $gateway := .Values.ossmFederation.additionalGateways }}
+{{- if $gateway.remote }}
+apiVersion: federation.maistra.io/v1
+kind: ServiceMeshPeer
+metadata:
+  name: {{ $gateway.name }}-mesh
+  namespace: istio-system
+spec:
+  remote:
+    addresses:
+    {{- range $address := $gateway.remote.addresses }}
+    - {{ $address }}
+    {{- end }}
+    discoveryPort: {{ $gateway.remote.discoveryPort | default 8188 }}
+    servicePort: {{ $gateway.remote.servicePort | default 15443 }}
+  gateways:
+    ingress:
+      name: ingress-{{ $gateway.name }}-mesh
+    egress:
+      name: egress-{{ $gateway.name }}-mesh
+  security:
+    trustDomain: {{ $gateway.name }}-mesh.local
+    clientID: {{ $gateway.name }}-mesh.local/ns/istio-system/sa/egress-{{ $.Values.ossmFederation.trustDomain }}-mesh-service-account
+    certificateChain:
+      kind: ConfigMap
+      name: {{ $gateway.name }}-ca-root-cert
+---
+{{- end }}
+{{- end }}
+{{- end }}
+

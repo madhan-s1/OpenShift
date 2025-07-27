@@ -1,0 +1,11 @@
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+  name: falcon-operator
+  namespace: falcon-operator
+spec:
+  targetNamespaces:
+  - falcon-system
+

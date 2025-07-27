@@ -1,0 +1,47 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- ../../base
+patches:
+  - target:
+      version: v1beta1
+      kind: MachineSet
+      name: worker-machineset
+      namespace: openshift-machine-api
+    patch: |-
+      - op: replace
+        path: /metadata/name
+        value: strl-ocp-unit-1-7bgkf-worker
+      - op: replace
+        path: /metadata/labels/machine.openshift.io~1cluster-api-cluster
+        value: strl-ocp-unit-1-7bgkf
+      - op: replace
+        path: /spec/selector/matchLabels/machine.openshift.io~1cluster-api-cluster
+        value: strl-ocp-unit-1-7bgkf
+      - op: replace
+        path: /spec/selector/matchLabels/machine.openshift.io~1cluster-api-machineset
+        value: strl-ocp-unit-1-7bgkf-worker
+      - op: replace
+        path: /spec/template/metadata/labels/machine.openshift.io~1cluster-api-cluster
+        value: strl-ocp-unit-1-7bgkf
+      - op: replace
+        path: /spec/template/metadata/labels/machine.openshift.io~1cluster-api-machineset
+        value: strl-ocp-unit-1-7bgkf-worker
+      - op: replace
+        path: /spec/template/spec/providerSpec/value/network/devices/0/networkName
+        value: JBoss-BD_UNIT_VLAN3529_RHO_JBOSS
+      - op: replace
+        path: /spec/template/spec/providerSpec/value/template
+        value: strl-ocp-unit-1-7bgkf-rhcos
+      - op: replace
+        path: /spec/template/spec/providerSpec/value/workspace/datastore
+        value: STR-56K1-JBOSS-UNIT01-03
+      - op: replace
+        path: /spec/template/spec/providerSpec/value/workspace/resourcePool
+        value: /CLOUD/host/STR JBOSS CLUSTER1/Resources
+      - op: replace
+        path: /spec/replicas
+        value: 4
+
+

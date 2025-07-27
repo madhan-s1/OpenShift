@@ -1,0 +1,10 @@
+apiVersion: operator.openshift.io/v1
+kind: ClusterCSIDriver
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+  name: smb.csi.k8s.io
+spec:
+  managementState: Managed
+
+

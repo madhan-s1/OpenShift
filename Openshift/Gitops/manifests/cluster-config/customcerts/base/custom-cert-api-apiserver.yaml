@@ -1,0 +1,15 @@
+apiVersion: config.openshift.io/v1
+kind: APIServer
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "6"
+  name: cluster
+spec:
+  audit:
+    profile: Default
+  servingCerts:
+    namedCertificates:
+      - names:
+          - api.clustername.region.apptoapp.net
+        servingCertificate:
+          name: qubitapi

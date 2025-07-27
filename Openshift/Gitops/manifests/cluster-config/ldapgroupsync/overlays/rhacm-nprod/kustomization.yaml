@@ -1,0 +1,44 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- ../../base
+patches:
+  - target:
+      version: v1
+      kind: CronJob
+      name: ldap-group-syncer
+      namespace: ldap-sync
+    patch: |-
+      - op: replace
+        path: /spec/schedule
+        value: "00 * * * *"
+      - op: replace
+        path: /spec/jobTemplate/spec/template/spec/containers/0/image
+        value: "registry.redhat.io/openshift4/ose-cli:latest"
+  - target:
+      version: v1
+      kind: ClusterRoleBinding
+      name: cluster-reader
+    patch: |-
+      - op: replace
+        path: /subjects/0/name
+        value: G-OCP-RHACM-READ-ONLY
+  - target:
+      version: v1
+      kind: ClusterRoleBinding
+      name: cluster-administrators
+    patch: |-
+      - op: replace
+        path: /subjects/0/name
+        value: G-OCP-RHACM-CLUSTER-ADMINS
+  - target:
+      version: v1
+      kind: ClusterRoleBinding
+      name: basic-user
+    patch: |-
+      - op: replace
+        path: /subjects/0/name
+        value: G-OCP-NPROD-BASIC-USER
+
+

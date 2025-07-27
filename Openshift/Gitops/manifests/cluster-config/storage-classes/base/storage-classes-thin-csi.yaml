@@ -1,0 +1,14 @@
+allowVolumeExpansion: true
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+  name: thin-csi
+parameters:
+  StoragePolicyName: openshift-storage-policy
+provisioner: csi.vsphere.vmware.com
+reclaimPolicy: Delete
+volumeBindingMode: WaitForFirstConsumer
+
+

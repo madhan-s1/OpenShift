@@ -1,0 +1,19 @@
+{{- range $machine := .Values.machine.machineSets }}
+{{- range $name := $machine.names }}
+---
+apiVersion: autoscaling.openshift.io/v1beta1
+kind: MachineAutoscaler
+metadata:
+  name: {{ $name }}
+  namespace: openshift-machine-api
+spec:
+  maxReplicas: {{ $machine.replicas.max }}
+  minReplicas: {{ $machine.replicas.min }}
+  scaleTargetRef:
+    apiVersion: machine.openshift.io/v1beta1
+    kind: MachineSet
+    name: {{ $name }}
+
+{{- end }}
+{{- end }}
+

@@ -1,0 +1,17 @@
+apiVersion: machineconfiguration.openshift.io/v1
+kind: MachineConfigPool
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+  name: worker-hp-1
+  labels:
+    worker-hp-1: ""
+spec:
+  machineConfigSelector:
+    matchExpressions:
+      - {key: machineconfiguration.openshift.io/role, operator: In, values: [worker,worker-hp-1]}
+  nodeSelector:
+    matchLabels:
+      node-role.kubernetes.io/worker-hp-1: ""
+
+

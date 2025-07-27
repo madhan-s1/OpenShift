@@ -1,0 +1,13 @@
+apiVersion: samples.operator.openshift.io/v1
+kind: Config
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+  name: cluster
+spec:
+  architectures:
+  - x86_64
+  managementState: Removed
+  samplesRegistry: registry.redhat.io
+
+

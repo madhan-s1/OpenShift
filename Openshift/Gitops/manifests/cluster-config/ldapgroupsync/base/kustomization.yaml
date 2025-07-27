@@ -1,0 +1,17 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- ldap-sync-namespace.yaml
+- ldap-sync-secret.yaml
+- ldap-sync-config-map.yaml
+- ldap-sync-ca-config-map.yaml
+- ldap-sync-service-account.yaml
+- ldap-sync-cluster-role.yaml
+- ldap-sync-cluster-role-binding.yaml
+- ldap-sync-cron-job.yaml
+- ldap-sync-clusterrolebinding-cluster-reader.yaml
+- ldap-sync-clusterrolebinding-cluster-admins.yaml
+- ldap-sync-clusterrolebinding-basic-user.yaml
+
+

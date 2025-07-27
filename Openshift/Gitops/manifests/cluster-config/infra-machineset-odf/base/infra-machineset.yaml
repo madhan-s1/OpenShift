@@ -1,0 +1,58 @@
+apiVersion: machine.openshift.io/v1beta1
+kind: MachineSet
+metadata:
+  labels:
+    machine.openshift.io/cluster-api-cluster: infrastructure_id
+  name: infra-odf-machineset
+  namespace: openshift-machine-api
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      machine.openshift.io/cluster-api-cluster: infrastructure_id
+      machine.openshift.io/cluster-api-machineset: infrastructure_id-infra-odf
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        machine.openshift.io/cluster-api-cluster: infrastructure_id
+        machine.openshift.io/cluster-api-machine-role: infra
+        machine.openshift.io/cluster-api-machine-type: infra
+        machine.openshift.io/cluster-api-machineset: infrastructure_id-infra-odf
+    spec:
+      metadata:
+        creationTimestamp: null
+        labels:
+          node-role.kubernetes.io/infra: ''
+          cluster.ocs.openshift.io/openshift-storage: ""
+      taints:
+      - key: node.ocs.openshift.io/storage
+        value: 'true'
+        effect: NoSchedule        
+      providerSpec:
+        value:
+          apiVersion: vsphereprovider.openshift.io/v1beta1
+          credentialsSecret:
+            name: vsphere-cloud-credentials
+          diskGiB: 120
+          kind: VSphereMachineProviderSpec
+          memoryMiB: 32768
+          metadata:
+            creationTimestamp: null
+          network:
+            devices:
+            - networkName: vm_network_name
+          numCPUs: 8
+          numCoresPerSocket: 2
+          snapshot: ""
+          template: vm_template_name
+          userDataSecret:
+            name: worker-user-data
+          workspace:
+            datacenter: CLOUD
+            datastore: vcenter_datastore_name
+            folder: /CLOUD/vm/RHO
+            resourcePool: vsphere_resource_pool
+            server: jvcewvvc9702.dsglobal.org
+
+

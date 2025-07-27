@@ -1,0 +1,28 @@
+prometheus:
+  nodeSelector:
+    node-role.kubernetes.io/infra: ""
+  tolerations:
+    - effect: NoSchedule
+      key: node-role.kubernetes.io/infra
+      operator: Exists
+  volumeClaimTemplate:
+    spec:
+      storageClassName: thin-csi
+      resources:
+        requests:
+          storage: 50Gi
+thanosRuler:
+  nodeSelector:
+    node-role.kubernetes.io/infra: ""
+  tolerations:
+    - effect: NoSchedule
+      key: node-role.kubernetes.io/infra
+      operator: Exists
+  volumeClaimTemplate:
+    spec:
+      storageClassName: thin-csi
+      resources:
+        requests:
+          storage: 10Gi
+
+

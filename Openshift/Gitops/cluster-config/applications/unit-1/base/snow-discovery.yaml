@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: config-snow-discovery
+  namespace: openshift-gitops
+spec:
+  destination:
+    server: "https://kubernetes.default.svc"
+    namespace: openshift-gitops
+  project: cluster-config
+  source:
+    path: Gitops/manifests/cluster-config/snow-discovery/overlays/unit-1
+    repoURL: https://github.com/madhan-s1/OpenShift
+    targetRevision: master
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+
+---
+

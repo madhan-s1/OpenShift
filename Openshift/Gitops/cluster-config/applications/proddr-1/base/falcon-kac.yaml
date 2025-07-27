@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: config-falcon-kac
+  namespace: openshift-gitops
+spec:
+  project: cluster-config
+  source:
+    repoURL: https://github.com/madhan-s1/OpenShift
+    path: Gitops/manifests/cluster-config/falcon-kac
+    targetRevision: master
+    helm:
+      valueFiles:
+        - values.yaml
+      parameters:
+        - name: namespace
+          value: falcon-kac
+        - name: cid
+          value: 93B439AE3A954A05827741D862CB70EB-1A
+        - name: clusterName
+          value: "strl-ocp-proddr-1"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: falcon-kac
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

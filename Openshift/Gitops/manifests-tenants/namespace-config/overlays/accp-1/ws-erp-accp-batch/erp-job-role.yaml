@@ -1,0 +1,24 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: erp-job-role
+  namespace: ws-erp-accp-batch
+rules:
+- apiGroups:
+  - batch
+  resources:
+  - job
+  verbs:
+  - create
+  - get
+  - list
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - pods/log
+  - namespaces
+  verbs:
+  - get
+
+

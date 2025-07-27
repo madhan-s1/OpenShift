@@ -1,0 +1,28 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+ - ../../base
+
+configMapGenerator:
+- name: cluster-monitoring-config
+  namespace: openshift-monitoring
+  files:
+  - cluster-monitoring/config.yaml
+- name: user-workload-monitoring-config
+  namespace: openshift-user-workload-monitoring
+  files:
+  - user-workload-monitoring/config.yaml
+
+secretGenerator:
+- name: alertmanager-main
+  namespace: openshift-monitoring
+  files:
+  - alertmanager/alertmanager.yaml
+
+generatorOptions:
+  disableNameSuffixHash: true
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+
+

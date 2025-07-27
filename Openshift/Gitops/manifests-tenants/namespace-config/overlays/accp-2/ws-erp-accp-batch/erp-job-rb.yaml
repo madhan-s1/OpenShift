@@ -1,0 +1,14 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: erp-job-rb
+  namespace: ws-erp-accp-batch
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: erp-job-role
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: User
+  name: s710054
+

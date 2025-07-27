@@ -1,0 +1,71 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: cluster-monitoring-config
+  namespace: openshift-monitoring
+data:
+  config.yaml: |
+    alertmanagerMain:
+      tolerations:
+      - effect: NoSchedule
+        operator: Exists
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+    prometheusOperator:
+      tolerations:
+      - effect: NoSchedule
+        operator: Exists
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+    grafana:
+      tolerations:
+      - effect: NoSchedule
+        operator: Exists
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+    k8sPrometheusAdapter:
+      tolerations:
+      - effect: NoSchedule
+        operator: Exists
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+    kubeStateMetrics:
+      tolerations:
+      - effect: NoSchedule
+        operator: Exists
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+    telemeterClient:
+      tolerations:
+      - effect: NoSchedule
+        operator: Exists    
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+    openshiftStateMetrics:
+      tolerations:
+      - effect: NoSchedule
+        operator: Exists
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+    thanosQuerier:
+      tolerations:
+      - effect: NoSchedule
+        operator: Exists    
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+    enableUserWorkload: true
+    prometheusK8s:
+      tolerations:
+      - effect: NoSchedule
+        operator: Exists
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""       
+      volumeClaimTemplate:
+        spec:
+          storageClassName: thin
+          volumeMode: Filesystem
+          resources:
+            requests:
+              storage: 50Gi
+
+

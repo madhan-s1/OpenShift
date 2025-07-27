@@ -1,0 +1,51 @@
+apiVersion: falcon.crowdstrike.com/v1alpha1
+kind: FalconNodeSensor
+metadata:
+  name: falcon-node-sensor
+  namespace: falcon-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "4"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  falcon:
+    apd: false
+    tags:
+      - daemonset
+    trace: none
+    cid: 93B439AE3A954A05827741D862CB70EB-1A
+  node:
+    imagePullPolicy: Always
+    imagePullSecrets:
+      - name: regcred
+    backend: kernel
+    terminationGracePeriod: 30
+    disableCleanup: false
+    tolerations:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/master
+        operator: Exists
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/control-plane
+        operator: Exists
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/infra
+        operator: Exists
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/worker
+        operator: Exists
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/worker-hp
+        operator: Exists
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/worker-hp-1
+        operator: Exists
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/worker-hp-2
+        operator: Exists
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/worker-1
+        operator: Exists
+    updateStrategy:
+      type: RollingUpdate
+    image: >-
+      artifactory.qubit.net/azimages-dev-local/falcon-sensor/us-1/release/falcon-sensor:7.07.0-16206-1.falcon-linux.x86_64.Release.US-1

@@ -1,0 +1,50 @@
+apiVersion: machine.openshift.io/v1beta1
+kind: MachineSet
+metadata:
+  labels:
+    machine.openshift.io/cluster-api-cluster: strl-ocp-unit-intg-1-mvb9d
+  name: strl-ocp-unit-intg-1-mvb9d-infra
+  namespace: openshift-machine-api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      machine.openshift.io/cluster-api-cluster: strl-ocp-unit-intg-1-mvb9d
+      machine.openshift.io/cluster-api-machineset: strl-ocp-unit-intg-1-mvb9d-infra
+  template:
+    metadata:
+      labels:
+        machine.openshift.io/cluster-api-cluster: strl-ocp-unit-intg-1-mvb9d
+        machine.openshift.io/cluster-api-machine-role: infra
+        machine.openshift.io/cluster-api-machine-type: infra
+        machine.openshift.io/cluster-api-machineset: strl-ocp-unit-intg-1-mvb9d-infra
+    spec:
+      metadata:
+        labels:
+          node-role.kubernetes.io/infra: "" 
+      providerSpec:
+        value:
+          apiVersion: machine.openshift.io/v1beta1
+          credentialsSecret:
+            name: vsphere-cloud-credentials
+          diskGiB: 120
+          kind: VSphereMachineProviderSpec
+          memoryMiB: 24576
+          metadata:
+          network:
+            devices:
+            - networkName: JBoss-BD_UNIT_INTG_VLAN3511_RHO_JBOSS 
+          numCPUs: 4
+          numCoresPerSocket: 2
+          snapshot: ""
+          template: strl-ocp-unit-intg-1-mvb9d-rhcos
+          userDataSecret:
+            name: worker-user-data
+          workspace:
+            datacenter: CLOUD
+            datastore: PSTRJBCL_G15K1_OS-INTG_01
+            folder: /CLOUD/vm/RHO
+            resourcePool: /CLOUD/host/STR JBOSS CLUSTER1/Resources
+            server: jvcewvvc9702.dsglobal.org
+
+

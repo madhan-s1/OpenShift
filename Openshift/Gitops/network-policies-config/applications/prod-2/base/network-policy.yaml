@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: config-network-policies
+  namespace: openshift-gitops
+spec:
+  destination:
+    server: "https://kubernetes.default.svc"
+    namespace: openshift-gitops
+  project: netpol-config
+  source:
+    path: network-policies/environments/prod-2
+    repoURL: "https://github.com/madhan-s1/oc-policies.git"
+    targetRevision: master
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

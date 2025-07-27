@@ -1,0 +1,23 @@
+---
+apiVersion: security.istio.io/v1beta1
+kind: RequestAuthentication
+metadata:
+  name: app-jwt
+  namespace: istio-system
+spec:
+  selector:
+    matchLabels:
+      istio: ingressgateway-engg
+      app: istio-ingressgateway-engg
+  jwtRules:
+  - issuer: "ssoweb_external_unit"
+    jwksUri: https://lastmile-keys.engg.apptoapp.net/jwks.json
+    fromHeaders:
+    - name: Authorization
+      prefix: "Bearer "
+    forwardOriginalToken: true
+    outputPayloadToHeader: "x-jwt-payload"
+
+---
+
+

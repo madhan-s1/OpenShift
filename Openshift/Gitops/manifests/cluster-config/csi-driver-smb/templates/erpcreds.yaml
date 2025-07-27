@@ -1,0 +1,14 @@
+{{- if .Values.erpcreds }}
+kind: Secret
+apiVersion: v1
+metadata:
+  name: erpcreds
+  namespace: {{ .Release.Namespace }}
+data:
+  domain: {{ .Values.erpcreds.domain }}
+  password: {{ .Values.erpcreds.password }}
+  username: {{ .Values.erpcreds.username }}
+type: Opaque
+{{- end}}
+
+

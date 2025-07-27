@@ -1,0 +1,66 @@
+apiVersion: logging.openshift.io/v1
+kind: ClusterLogging
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "6"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+  name: instance
+  namespace: openshift-logging
+spec:
+  managementState: Managed
+  # logStore:
+  #   elasticsearch:
+  #     nodeCount: 3
+  #     nodeSelector:
+  #       node-role.kubernetes.io/infra: ""
+  #     proxy:
+  #       resources:
+  #         limits:
+  #           memory: 256Mi
+  #         requests:
+  #           memory: 256Mi
+  #     redundancyPolicy: SingleRedundancy
+  #     resources:
+  #       limits:
+  #         memory: 8Gi
+  #       requests:
+  #         cpu: 250m
+  #         memory: 8Gi
+  #     storage:
+  #       size: 200G
+  #       storageClassName: storageclass
+  #     tolerations:
+  #     - effect: NoSchedule
+  #       key: node-role.kubernetes.io/infra
+  #       operator: Exists
+  #   retentionPolicy:
+  #     application:
+  #       maxAge: 1d
+  #     audit:
+  #       maxAge: 7d
+  #     infra:
+  #       maxAge: 7d
+  #   type: elasticsearch
+  # visualization:
+  #   kibana:
+  #     nodeSelector:
+  #       node-role.kubernetes.io/infra: ""
+  #     replicas: 1
+  #     resources:
+  #       limits:
+  #         memory: 1Gi
+  #       requests:
+  #         cpu: 500m
+  #         memory: 1Gi
+  #     tolerations:
+  #     - effect: NoSchedule
+  #       key: node-role.kubernetes.io/infra
+  #       operator: Exists
+  #   type: kibana
+  collection:
+    tolerations:
+      - effect: NoSchedule
+        operator: Exists
+    type: vector
+
+

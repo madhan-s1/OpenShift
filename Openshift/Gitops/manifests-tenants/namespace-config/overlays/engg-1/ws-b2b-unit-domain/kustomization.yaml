@@ -1,0 +1,50 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: ws-b2b-unit-domain
+
+bases:
+  - ../../../base
+  - ../base
+
+patches:
+  - target:
+      kind: RoleBinding
+      name: project-qubit-web-support
+    patch: |-
+      - op: replace
+        path: /subjects/0/name
+        value: G-OCP-WEBOPS
+  - target:
+      kind: RoleBinding
+      name: project-view
+    patch: |-
+      - op: replace
+        path: /subjects/0/name
+        value: G-OCP-B2B-NonProd
+      - op: replace
+        path: /subjects/1/name
+        value: G-OCP-B2C-NonProd
+      - op: replace
+        path: /subjects/2/name
+        value: G-OCP-EB-NonProd
+      - op: replace
+        path: /subjects/3/name
+        value: G-OCP-CORP-NonProd
+      - op: replace
+        path: /subjects/4/name
+        value: G-OCP-APPOPS
+  - target:
+      kind: RoleBinding
+      name: anyuid-qubit
+    patch: |-
+      - op: replace
+        path: /subjects/0/namespace
+        value: ws-b2b-unit-domain
+  - target:
+      kind: RoleBinding
+      name: viewer-qubit-apps
+    patch: |-
+      - op: replace
+        path: /subjects/0/namespace
+        value: ws-b2b-unit-domain

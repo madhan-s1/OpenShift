@@ -1,0 +1,34 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    argocd.argoproj.io/sync-wave: "2"
+  name: ca-config-map
+  namespace: openshift-config
+data:
+  ca.crt: |
+    -----BEGIN CERTIFICATE-----
+    MIIDrzCCApegAwIBAgIQM33RAb7OSMWpkkRLHUvDtDANBgkqhkiG9w0BAQsFADBw
+    MQswCQYDVQQGEwJVUzEXMBUGA1UEChMOVm95YSBGaW5hbmNpYWwxKDAmBgNVBAsT
+    H1ZveWEgSW5mb3JtYXRpb24gVHJ1c3QgU2VydmljZXMxHjAcBgNVBAMTFVZveWEg
+    SW50ZXJuYWwgUm9vdCBDQTAeFw0xNjAzMDQwMDAwMDBaFw0zNjAzMDMyMzU5NTla
+    MHAxCzAJBgNVBAYTAlVTMRcwFQYDVQQKEw5Wb3lhIEZpbmFuY2lhbDEoMCYGA1UE
+    CxMfVm95YSBJbmZvcm1hdGlvbiBUcnVzdCBTZXJ2aWNlczEeMBwGA1UEAxMVVm95
+    YSBJbnRlcm5hbCBSb290IENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+    AQEAk+cZxPMISI9KwS/vAuSHg5DtoQgD24Y0eipK/cXu0CH+87XSP7grcHuBGcPo
+    oiTUVWUNDkDhICG4ppeMT4H5akiUoVZWvTau/ZcXpiS1aLdQKF0ZEcIYMU2DUWYz
+    jsomk0mLHxaEz+Z4YCO6GogfumDPcgUD/L67Vvy0JWvBTeqVkyx7kDiTZfU+/fTR
+    3e8Eu39zb5+VSg0rKPZybzvvXbR3MyI3MgUw8aYwUjrrSlPc4KiXZJmpWr/K8nXs
+    Ug38yj010pgfYiZwmKPYqL9nTxUTM8QESqMjuMPRZ2DbM4Q/CoFT4DZy0RFrYDoX
+    Aq4iXxrN8qttp/Cw/wymrHo+9QIDAQABo0UwQzASBgNVHRMBAf8ECDAGAQH/AgEB
+    MA4GA1UdDwEB/wQEAwIBBjAdBgNVHQ4EFgQUcHF9KXwQKkDrvNBRFmujFVzh3Jgw
+    DQYJKoZIhvcNAQELBQADggEBAF/HJbF2fyMvtnVI1v9fYlBj38zJ5gf1IHeEgnlo
+    S2uBMuBqZgM4ew19Z3xUznp6FSh+BXUpMsSdyo4xr7i6PYeYSx1hmR+46gFAGJbp
+    XyWe4foGOuZpx4mTu99oUekxN6nYNj3pSJvBbMlakw50p5YD9zWEhtRDEbfPreZI
+    9W+DF4sesa3CNnzkvGTAQStdkLjaHmqHOAvgDYuBj18j8P5fzUmV9SRhSFt1CxKY
+    S++MsskU3nFVP4nAk5mcSsSho52R7OpCY+E6mwseR/BYQVHM7I5HPFUNF+cj5f9v
+    rsxZnMVaHamPGy08ri0JX15tvCIyCbi3m0rUICxTOVUZFuI=
+    -----END CERTIFICATE-----
+
+

@@ -1,0 +1,10 @@
+#
+# This file contains the definition for this helm chart.
+#
+apiVersion: v2
+name: control-plane
+description: helm chart for multiple ingress installation
+
+version: 1.0.0
+appVersion: 4.10.20
+

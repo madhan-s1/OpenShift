@@ -1,0 +1,22 @@
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: "app-ingress"
+  namespace: istio-system
+spec:
+  selector:
+    matchLabels:
+      istio: ingressgateway-engg
+      app: istio-ingressgateway-engg
+  action: ALLOW
+  rules:
+  - when:
+    - key: request.auth.claims[iss]
+      values: ["ssoweb_external_unit"]
+    - key: request.auth.claims[client_id]
+      values: ["RfYk6IrftuMKK1pcKdt0SPY4lrx8TLia"]
+
+---
+
+

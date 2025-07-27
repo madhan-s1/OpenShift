@@ -1,0 +1,14 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base
+
+patches:
+  - target:
+      kind: FalconNodeSensor
+      name: falcon-node-sensor
+    patch: |-
+      - op: replace
+        path: /spec/node/image
+        value: 'artifactory.qubit.net/azimages-dev-local/falcon-sensor/us-1/release/falcon-sensor:7.20.0-17306-1.falcon-linux.Release.US-1'

@@ -1,0 +1,26 @@
+cluster:
+  autoscale:
+    resources:
+      maxNodesTotal: 32
+      minCoreNumber: 8
+      maxCoreNumber: 256
+      minMemory: 32
+      maxMemory: 960
+
+machine:
+  machineSets:
+  - names: 
+    - strl-ocp-engg-1-fxgbf-worker-hp
+    replicas:
+      min: 8
+      max: 21
+  # - names: 
+  #   - strl-ocp-engg-1-fxgbf-worker
+  #   replicas:
+  #     min: 3
+  #     max: 5
+
+
+
+
+

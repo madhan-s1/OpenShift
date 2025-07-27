@@ -1,0 +1,46 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: bookinfo-gateway-app
+  namespace: istio-system
+spec:
+  selector:
+    istio: ingressgateway-engg
+    app: istio-ingressgateway-engg
+  servers:
+  - port:
+      number: 80
+      name: http2
+      protocol: HTTP2
+    hosts:
+    - "istio-ingressgateway-engg.apps.strl-ocp-engg-1.unit.apptoapp.net"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: bookinfo
+  namespace: ws-dataplane-1
+spec:
+  hosts:
+    - "istio-ingressgateway-engg.apps.strl-ocp-engg-1.unit.apptoapp.net"
+  gateways:
+  - istio-system/bookinfo-gateway-app
+  http:
+  - match:
+    - uri:
+        exact: /productpage
+    - uri:
+        prefix: /static
+    - uri:
+        exact: /login
+    - uri:
+        exact: /logout
+    - uri:
+        prefix: /api/v1/products
+    route:
+    - destination:
+        host: productpage
+        port:
+          number: 9080
+
+

@@ -1,0 +1,44 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- ../../base
+patches:
+  - target:
+      version: v1beta1
+      kind: MachineSet
+      name: worker-machineset
+      namespace: openshift-machine-api
+    patch: |-
+      - op: replace
+        path: /metadata/name
+        value: strl-ocp-rhacm-bxsl6-worker
+      - op: replace
+        path: /metadata/labels/machine.openshift.io~1cluster-api-cluster
+        value: strl-ocp-rhacm-bxsl6
+      - op: replace
+        path: /spec/selector/matchLabels/machine.openshift.io~1cluster-api-cluster
+        value: strl-ocp-rhacm-bxsl6
+      - op: replace
+        path: /spec/selector/matchLabels/machine.openshift.io~1cluster-api-machineset
+        value: strl-ocp-rhacm-bxsl6-worker
+      - op: replace
+        path: /spec/template/metadata/labels/machine.openshift.io~1cluster-api-cluster
+        value: strl-ocp-rhacm-bxsl6
+      - op: replace
+        path: /spec/template/metadata/labels/machine.openshift.io~1cluster-api-machineset
+        value: strl-ocp-rhacm-bxsl6-worker
+      - op: replace
+        path: /spec/template/spec/providerSpec/value/network/devices/0/networkName
+        value: JBoss-BD_ACCP_VLAN3527_RHACM_JBOSS
+      - op: replace
+        path: /spec/template/spec/providerSpec/value/template
+        value: strl-ocp-rhacm-bxsl6-rhcos
+      - op: replace
+        path: /spec/template/spec/providerSpec/value/workspace/datastore
+        value: PSTRJBCL_G15K1_OS-ACCP_03
+      - op: replace
+        path: /spec/template/spec/providerSpec/value/workspace/resourcePool
+        value: /CLOUD/host/STR JBOSS CLUSTER1/Resources
+
+

@@ -1,0 +1,26 @@
+cluster:
+  autoscale:
+    resources:
+      maxNodesTotal: 100
+      minCoreNumber: 8
+      maxCoreNumber: 900
+      minMemory: 32
+      maxMemory: 4000
+
+machine:
+  machineSets:
+  - names: 
+    - strl-ocp-accp-2-k8lf9-worker-hp
+    replicas:
+      min: 38
+      max: 39
+  # - names: 
+  #   - strl-ocp-accp-2-k8lf9-worker
+  #   replicas:
+  #     min: 3
+  #     max: 5
+
+
+
+
+

@@ -1,0 +1,56 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- ../../base
+patches:
+  - target:
+      version: v1beta1
+      kind: MachineSet
+      name: worker-hp-2-machineset
+      namespace: openshift-machine-api
+    patch: |-
+      - op: replace
+        path: /metadata/name
+        value: shk-ocp-prod-2-cmw65-worker-hp-2
+      - op: replace
+        path: /metadata/labels/machine.openshift.io~1cluster-api-cluster
+        value: shk-ocp-prod-2-cmw65
+      - op: replace
+        path: /spec/selector/matchLabels/machine.openshift.io~1cluster-api-cluster
+        value: shk-ocp-prod-2-cmw65
+      - op: replace
+        path: /spec/selector/matchLabels/machine.openshift.io~1cluster-api-machineset
+        value: shk-ocp-prod-2-cmw65-worker-hp-2
+      - op: replace
+        path: /spec/template/metadata/labels/machine.openshift.io~1cluster-api-cluster
+        value: shk-ocp-prod-2-cmw65
+      - op: replace
+        path: /spec/template/metadata/labels/machine.openshift.io~1cluster-api-machineset
+        value: shk-ocp-prod-2-cmw65-worker-hp-2
+      - op: replace
+        path: /spec/template/spec/providerSpec/value/network/devices/0/networkName
+        value: Jboss-BD_PROD2_VLAN2524_RHO_JBOSS
+      - op: replace
+        path: /spec/template/spec/providerSpec/value/template
+        value: shk-ocp-prod-2-cmw65-rhcos
+      - op: replace
+        path: /spec/template/spec/providerSpec/value/workspace/datacenter
+        value: Cloud
+      - op: replace
+        path: /spec/template/spec/providerSpec/value/workspace/datastore
+        value: SHK-56K1-JBOSS-DS-NRP-NTI-005
+      - op: replace
+        path: /spec/template/spec/providerSpec/value/workspace/folder
+        value: /Cloud/vm/RHO
+      - op: replace
+        path: /spec/template/spec/providerSpec/value/workspace/resourcePool
+        value: /Cloud/host/SHK JBOSS CLUSTER/Resources
+      - op: replace
+        path: /spec/template/spec/providerSpec/value/workspace/server
+        value: mvcewvvc9701.dsglobal.org
+      - op: replace
+        path: /spec/replicas
+        value: 33
+
+

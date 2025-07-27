@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: config-autoscaler
+  namespace: openshift-gitops
+spec:
+  destination:
+    server: "https://kubernetes.default.svc"
+    namespace: openshift-gitops
+  project: cluster-config
+  source:
+    path: Gitops/manifests/cluster-config/autoscaler
+    repoURL: "https://github.com/madhan-s1/OpenShift.git"
+    targetRevision: master
+    helm:
+      releaseName: openshift-autoscale
+      valueFiles:
+        - values-rhacm-nprod.yaml
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

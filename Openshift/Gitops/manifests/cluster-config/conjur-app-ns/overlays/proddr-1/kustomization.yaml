@@ -1,0 +1,42 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+bases:
+- ws-b2b-prod-domain
+- ws-b2b-prod-edge
+- ws-b2c-prod-domain
+- ws-b2c-prod-edge
+- ws-op-prod-domain
+- ws-ivr-prod-domain
+- ws-ivr-prod-edge
+- ws-vpc-prod-domain
+- ws-vpc-prod-edge
+- ws-mdm-prod-domain
+- ws-hcentral-prod-domain
+- ws-tms-prod
+- ws-hav-prod-domain
+- ws-sav-prod-domain
+- ws-gnl-prod-domain
+- ws-clmptb-prod-domain
+- ws-vpa-prod-domain
+- ws-gpd-prod-domain
+- ws-esl-prod-domain
+- ws-rwm-api-prod
+- ws-b2bpais-prod-domain
+- ws-swift-prod-domain
+- ws-pnc-prod
+- ws-ems-prod-domain
+- ws-caseupdt-prod-domain
+- ws-accon-prod-domain
+- ws-b2b-admin-prod-ui
+- ws-b2b-admin-prod-edge
+- ws-fdtpa-prod-domain
+- ws-erp-prod-batch
+- ws-ops-prod-edge
+- ws-fndops-prod-edge
+- ws-bko-prod-edge
+- ws-fndops-prod-domain
+- ws-sec-prod-edge
+- ws-bko-prod-domain
+- ws-ops-prod-domain
+

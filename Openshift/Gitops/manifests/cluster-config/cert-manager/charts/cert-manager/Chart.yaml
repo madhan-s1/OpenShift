@@ -1,0 +1,12 @@
+apiVersion: v2
+appVersion: v1.0.0
+description: cert-manager operator
+maintainers:
+  - email: prannoy.seal@qubit.com
+    name: Prannoy Seal
+    url: https://cert-manager.io
+  - email: DL-PaaS-PlaformTeam@qubit.com
+    name: DL PaaS Platform
+name: cert-manager
+type: application
+version: v1.0.0

@@ -1,0 +1,46 @@
+kind: CronJob
+apiVersion: batch/v1
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "4"
+  name: openshift-backup
+  namespace: ocp-backup-etcd
+  labels:
+    app: openshift-backup
+spec:
+  schedule: "00 1 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 5
+  failedJobsHistoryLimit: 5
+  jobTemplate:
+    metadata:
+      labels:
+        app: openshift-backup
+    spec:
+      backoffLimit: 0
+      template:
+        metadata:
+          labels:
+            app: openshift-backup
+        spec:
+          containers:
+            - name: backup
+              image: "registry.redhat.io/openshift4/ose-cli:v4.9"
+              command:
+                - "/bin/bash"
+                - "-c"
+                - oc get no -l node-role.kubernetes.io/master --no-headers -o name | xargs -I {} --  oc debug {} -- bash -c 'chroot /host sudo -E /usr/local/bin/cluster-backup.sh /home/core/backup/ && chroot /host sudo -E find /home/core/backup/ -type f -ctime +"2" -delete'
+          nodeSelector:
+            node-role.kubernetes.io/infra: ""
+          tolerations:
+          - effect: NoSchedule
+            key: node-role.kubernetes.io/infra
+            operator: Exists
+          restartPolicy: "Never"
+          terminationGracePeriodSeconds: 30
+          activeDeadlineSeconds: 600
+          dnsPolicy: "ClusterFirst"
+          serviceAccountName: "openshift-backup"
+          serviceAccount: "openshift-backup"
+
+

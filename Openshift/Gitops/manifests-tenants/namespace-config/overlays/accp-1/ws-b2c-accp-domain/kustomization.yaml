@@ -1,0 +1,95 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: ws-b2c-accp-domain
+
+bases:
+  - ../../../base
+  - ../base
+
+patches:
+  - target:
+      kind: RoleBinding
+      name: project-qubit-web-support
+    patch: |-
+      - op: replace
+        path: /subjects/0/name
+        value: G-OCP-WEBOPS
+  - target:
+      kind: RoleBinding
+      name: project-view
+    patch: |-
+      - op: replace
+        path: /subjects/0/name
+        value: G-OCP-B2B-NonProd
+      - op: replace
+        path: /subjects/1/name
+        value: G-OCP-B2C-NonProd
+      - op: replace
+        path: /subjects/2/name
+        value: G-OCP-EB-NonProd
+      - op: replace
+        path: /subjects/3/name
+        value: G-OCP-CORP-NonProd
+      - op: replace
+        path: /subjects/4/name
+        value: G-OCP-APPOPS
+  - target:
+      kind: RoleBinding
+      name: anyuid-qubit
+    patch: |-
+      - op: replace
+        path: /subjects/0/namespace
+        value: ws-b2c-accp-domain
+  - target:
+      kind: RoleBinding
+      name: viewer-qubit-apps
+    patch: |-
+      - op: replace
+        path: /subjects/0/namespace
+        value: ws-b2c-accp-domain
+  #- target:
+  #    kind: ResourceQuota
+  #    name: resource-quota
+  #  patch: |-
+  #    - op: replace
+  #      path: /metadata/name
+  #      value: quota-team-a
+  #    - op: replace
+  #      path: /spec/hard/limits.cpu
+  #      value: 1
+  #    - op: replace
+  #      path: /spec/hard/services
+  #      value: 10
+  #- target:
+  #    kind: LimitRange
+  #    name: limit-range
+  #  patch: |-
+  #    - op: replace
+  #      path: /metadata/name
+  #      value: limit-team-a
+  - target:
+      kind: RoleBinding
+      name: pod-restart-rb
+    patch: |-
+      - op: replace
+        path: /subjects/0/name
+        value: G-OCP-B2C-NonProd
+  - target:
+      kind: RoleBinding
+      name: dynatrace-oneagent-metadata-viewer-rb
+    patch: |-
+      - op: replace
+        path: /subjects/0/name
+        value: system:serviceaccounts:ws-b2c-accp-domain
+patchesJson6902:
+  - path: read_only_rb_patch.json
+    target:
+      version: v1
+      kind: RoleBinding
+      name: istio-read-rolebinding
+  - path: nonprod_edit_deployment.json
+    target:
+      version: v1
+      kind: RoleBinding
+      name: nonprod-edit-deployment-rb

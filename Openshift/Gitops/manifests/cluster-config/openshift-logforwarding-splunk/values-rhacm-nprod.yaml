@@ -1,0 +1,37 @@
+fullnameOverride: openshift-logforwarding-splunk
+
+openshift:
+  logging:
+    namespace: openshift-logging
+    elasticsearch:
+      port: 9200
+  forwarding:
+    audit:
+      elasticsearch: true
+      splunk: true
+    app:
+      elasticsearch: true
+      splunk: false
+      syslog: true
+    infra:
+      elasticsearch: true
+      splunk: false
+
+forwarding:
+  splunk:
+    # Specify Splunk server details and HEC Token
+    token: 660111F4-30A0-4183-B3E4-6B26BACD4D0B
+    protocol: https
+    hostname: http-inputs-qubit.splunkcloud.com
+    port: 443
+    insecure: false
+  syslog:
+    # Specify syslog details
+    name: openshift-logforwarding-syslog
+    type: syslog
+    hostname: oshift.unit.apptoapp.net
+    port: 514
+    facility: user
+    rfc: RFC5424
+    payloadKey: message
+    severity: informational

@@ -1,0 +1,10 @@
+apiVersion: v2
+name: openshift-logforwarding-splunk
+description: Log Forwarding from OpenShift to Splunk
+version: 1.0.0
+appVersion: 1.0.0
+maintainers:
+  - email: prannoy.seal@qubit.com
+    name: Prannoy Seal
+  - email: DL-PaaS-PlaformTeam@qubit.com
+    name: PaaS Plaform Team

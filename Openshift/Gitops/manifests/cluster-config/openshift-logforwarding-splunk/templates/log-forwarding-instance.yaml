@@ -1,0 +1,106 @@
+{{- $fullName := include "openshift-logforwarding-splunk.fullname" . -}}
+apiVersion: logging.openshift.io/v1
+kind: ClusterLogForwarder
+metadata:
+  name: instance
+  namespace: {{ $.Values.openshift.logging.namespace }}
+  labels:
+    app.kubernetes.io/component: cluster-logging
+{{ include "openshift-logforwarding-splunk.labels" . | indent 4 }}
+spec:
+  inputs:
+  - name: jbossApp
+    application:
+      selector:
+        matchLabels:
+          appType: jboss
+  - name: springApp
+    application:
+      selector:
+        matchLabels:
+          appType: spring
+  - name: tomcatApp
+    application:
+      selector:
+        matchLabels:
+          appType: tomcat
+  - name: jwsApp
+    application:
+      selector:
+        matchLabels:
+          appType: jws
+  - name: nginx
+    application:
+      selector:
+        matchLabels:
+          appType: nginx
+  outputs:
+    - url: "{{ .Values.forwarding.splunk.protocol }}://{{ .Values.forwarding.splunk.hostname }}:{{ .Values.forwarding.splunk.port }}"
+      name: {{ $fullName }}
+      type: splunk
+      {{- if not .Values.forwarding.splunk.insecure }}
+      secret:
+        name: {{ $fullName }}
+      {{- end }}
+    {{- if .Values.openshift.forwarding.app.syslog }}
+    - name: {{ .Values.forwarding.syslog.name }}
+      type: {{ .Values.forwarding.syslog.type }}
+      syslog:
+        addLogSource: true      
+        facility: {{ .Values.forwarding.syslog.facility }}
+        severity: {{ .Values.forwarding.syslog.severity }}
+        payloadKey: {{ .Values.forwarding.syslog.payloadKey }}
+        rfc: {{ .Values.forwarding.syslog.rfc }}
+      url: "tcp://{{ $.Values.forwarding.syslog.hostname }}:{{ $.Values.forwarding.syslog.port }}"
+    {{- end }}  
+  pipelines:
+      {{- if or .Values.openshift.forwarding.app.elasticsearch .Values.openshift.forwarding.app.splunk .Values.openshift.forwarding.app.syslog}}
+    - inputRefs:
+        - application
+      name: container-logs
+      detectMultilineErrors: true
+      outputRefs:
+      {{- if .Values.openshift.forwarding.app.elasticsearch }}
+        - default
+      {{- end }}
+      {{- if .Values.openshift.forwarding.app.splunk }}
+        - {{ $fullName }}
+      {{- end }}      
+      {{- end }}
+      {{- if .Values.openshift.forwarding.app.syslog }}
+    - inputRefs:
+        - jbossApp
+        - springApp
+        - tomcatApp
+        - jwsApp
+        - nginx
+      name: jboss-spring-tomcat-logs
+      outputRefs:
+        - {{ $.Values.forwarding.syslog.name }}
+      {{- end }}
+      {{- if or .Values.openshift.forwarding.infra.elasticsearch .Values.openshift.forwarding.infra.splunk }}
+    - inputRefs:
+        - infrastructure
+      name: infra-logs
+      outputRefs:
+      {{- if or .Values.openshift.forwarding.infra.elasticsearch }}
+        - default
+      {{- end }}
+      {{- if or .Values.openshift.forwarding.infra.splunk }}
+        - {{ $fullName }}
+      {{- end }}
+      {{- end }}
+      {{- if or .Values.openshift.forwarding.audit.elasticsearch .Values.openshift.forwarding.audit.splunk }}
+    - inputRefs:
+        - audit
+      name: audit-logs
+      outputRefs:
+      {{- if or .Values.openshift.forwarding.audit.elasticsearch }}
+        - default
+      {{- end }}
+      {{- if or .Values.openshift.forwarding.audit.splunk }}
+        - {{ $fullName }}
+      {{- end }}
+      {{- end }}
+
+

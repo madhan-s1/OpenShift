@@ -1,0 +1,370 @@
+# Minimum Requirements
+# ====================
+# Replace <NAMESPACE> by the namespace in which you want to install the informer
+# Replace <INSTANCE_NAME> by your instance name (without the domain name)
+# Replace <CLUSTER_NAME> by the name of your cluster, as should be seen in the CMDB
+# Replace "N" by "Y" in the value of the environment variable ACCEPT_EULA
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: servicenow
+  namespace: snow-discovery
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: servicenow
+  namespace: snow-discovery
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - namespaces
+      - nodes
+      - pods
+      - services
+      - replicationcontrollers
+      - endpoints
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - apps
+    resources:
+      - deployments
+      - statefulsets
+      - daemonsets
+      - replicasets
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - batch
+    resources:
+      - jobs
+      - cronjobs
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - networking.k8s.io
+    resources:
+      - ingresses
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - apps.openshift.io
+    resources:
+      - deploymentconfigs
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - config.openshift.io
+    resources:
+      - images
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - config.openshift.io
+    resources:
+      - clusterversions
+    verbs:
+      - get
+  - apiGroups:
+      - route.openshift.io
+    resources:
+      - routes
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - build.openshift.io
+    resources:
+      - buildconfigs
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - user.openshift.io
+    resources:
+      - users
+      - groups
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - project.openshift.io
+    resources:
+      - projects
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - image.openshift.io
+    resources:
+      - images
+      - imagestreams
+    verbs:
+      - get
+      - list
+      - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: servicenow-snow-discovery
+  namespace: snow-discovery
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: servicenow
+subjects:
+  - kind: ServiceAccount
+    name: servicenow
+    namespace: snow-discovery
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: snow-discovery
+  name: servicenow
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - pods/log
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - apps
+    resources:
+      - deployments
+    verbs:
+      - get
+      - list
+      - watch
+      - patch
+  - apiGroups:
+      - ""
+    resources:
+      - events
+    verbs:
+      - list
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    resourceNames:
+      - snow-informer-additional-resources-qubitupgrade
+    verbs:
+      - get
+      - patch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: servicenow-snow-discovery
+  namespace: snow-discovery
+subjects:
+  - kind: ServiceAccount
+    name: servicenow
+    namespace: snow-discovery
+roleRef:
+  kind: Role
+  name: servicenow
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: snow-informer-additional-resources-qubitupgrade
+  namespace: snow-discovery
+data:
+  # Sample values for the resources and mappings.
+  # resources : '[{"apiGroups":["example.com"],"apiVersions":["v1"],"resources":["mycustomresources"]}]'
+  # mappings : '{"v1/configmaps":{"filter":[{"jsonPath":".metadata.name","regex":"^kube-root-ca.crt$"}]}}'
+  resources: ""
+  mappings: ""
+  mappings_oob: '{ "v1/nodes": { "fields": [ { "fieldExtractor": { "jsonPath": ".status.nodeInfo" }, "name": "node_info" }, { "fieldExtractor": { "jsonPath": ".spec.providerID" }, "name": "provider_id" } ]}}'
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: snow-informer-qubitupgrade
+  namespace: snow-discovery
+  labels:
+    app: snow_informer-qubitupgrade
+spec:
+  selector:
+    matchLabels:
+      app: snow_informer-qubitupgrade
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: snow_informer-qubitupgrade
+    spec:
+      nodeSelector:
+        kubernetes.io/os: linux
+      automountServiceAccountToken: true
+      volumes:
+        - name: additional-resources
+          configMap:
+            name: snow-informer-additional-resources-qubitupgrade
+            items:
+              - key: "resources"
+                path: "resources.json"
+              - key: "mappings"
+                path: "mappings.json"
+              - key: "mappings_oob"
+                path: "mappings_oob.json"
+        - name: custom-root-ca
+          configMap:
+            name: snow-informer-custom-root-ca-qubitupgrade
+            items:
+              - key: "custom_root_ca"
+                path: "root_ca.crt"
+        - name: credentials
+          secret:
+            secretName: snow-informer-cred-qubitupgrade
+      dnsPolicy: Default
+      serviceAccountName: servicenow
+      securityContext:
+        runAsNonRoot: true
+      imagePullSecrets:
+        - name: regcred
+      containers:
+        - command:
+            - /k8s_informer
+          args: ["--kubeconfig", "in_cluster", "--standalone", "true"]
+          image: &informerRepository artifactory.qubit.net/artifactory-docker-hub/servicenowdocker/informer:2.4.0
+          name: snowinformer
+          imagePullPolicy: Always
+          terminationMessagePolicy: FallbackToLogsOnError
+          securityContext:
+            runAsNonRoot: true
+          volumeMounts:
+            - name: additional-resources
+              readOnly: true
+              mountPath: "/etc/additionalResources"
+            - name: credentials
+              readOnly: true
+              mountPath: "/etc/credentials"
+            - name: custom-root-ca
+              readOnly: true
+              mountPath: "/etc/custom_root_ca"
+          env:
+            - name: ACCEPT_EULA
+              value: "Y"
+            - name: CLUSTER_NAME
+              value: "strl-ocp-unit-1"
+            - name: RESYNC_MIN
+              value: "0"
+            - name: SEND_INTERVAL_SEC
+              value: "" # Default is 10.
+            - name: MAX_CI_IN_MESSAGE
+              value: "50"
+            - name: REFRESH_TIME_MIN
+              value: "0"
+            - name: FULL_DISCOVERY_MIN
+              value: "" # Default is 1440.
+            - name: READ_COMMAND_SEC
+              value: "60"
+            - name: HEARTBEAT_MIN
+              value: "5"
+            - name: MAX_QUEUE_SIZE_BYTES
+              value: "262144000"
+            - name: MAX_RETRY
+              value: "5"
+            - name: MAX_ECC_PAYLOAD_SIZE_BYTES
+              value: "1048576"
+            - name: PROXY_URL
+              value: ""
+            - name: INSTANCE_URL
+              value: "https://qubitupgrade.service-now.com"
+            - name: ENV_INSTANCE_NAME
+              value: "qubitupgrade"
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: CONTINUOUS_DISCOVERY
+              value: "" # Default is true.
+            - name: ECC_SENDER_INTERVAL_SEC
+              value: "30"
+            - name: VERBOSE_LOGGING
+              value: "" # Default is false.
+            - name: INFORMER_REPOSITORY
+              value: *informerRepository
+            - name: SKIP_TLS_CERT_VALIDATION
+              value: "false"
+            - name: SUPPRESS_FREQUENT_CHANGES
+              value: "true"
+            - name: SUPPRESS_CHANGES_RATE_PER_MIN
+              value: "0.15"
+            - name: MIN_CHANGES_SUPPRESS_FREQUENT_CHANGES
+              value: "3"
+            - name: OPENSHIFT
+              value: "true" # Default is false.
+            - name: ADD_NODE_LABELS
+              value: "true"
+            - name: CREATE_SERVER_CI
+              value: "false" # Default is true.
+            - name: CLUSTER_RESOURCE_ID
+              value: ""
+            - name: INCLUDE_LABELS_AND_ANNOTATIONS
+              value: ""
+            - name: EXCLUDE_LABELS_AND_ANNOTATIONS
+              value: ""
+            - name: GET_CLUSTER_VERSION
+              value: "true"
+            - name: GET_RESOURCE_MAX_BYTES
+              value: "5242880"
+            - name: MAX_GET_RESOURCE_REQUESTS
+              value: "10"
+            - name: HTTP_REST_API_POST_RETRY_COUNT
+              value: "2"
+            - name: MAX_ELAPSED_TIME_MS
+              value: "10000"
+            - name: SELF_PATCHING_ALLOWED
+              value: "true"
+            - name: SECRET_PROVIDER
+              value: ""
+            - name: MIN_ESTIMATED_ECC_DELAY_SECONDS
+              value: "300"
+            - name: SHORT_LIVED_MIN_LIFESPAN_MINUTES
+              value: "15"
+            - name: SHORT_LIVED_SUPPRESS_RATIO
+              value: "10"
+            - name: USE_CUSTOM_ROOT_CA
+              value: "true"
+            - name: CREATE_CONTAINERS
+              value: "non_init_containers"
+          resources:
+            limits:
+              cpu: 100m
+              memory: 512Mi
+            requests:
+              cpu: 20m
+              memory: 200Mi
+      terminationGracePeriodSeconds: 10

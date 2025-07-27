@@ -1,0 +1,49 @@
+defaultingress: ingressgateway
+defaultegress: egressgateway
+manageNetworkPolicy: true
+loglevel: debug
+
+members:
+  - ws-sandbox-1
+  - ws-b2b-unit-domain
+  - ws-b2c-unit-domain
+  - ws-b2c-unit-edge
+  - ws-sandbox-2
+  - ws-sandbox-3
+  #- ws-dataplane-1
+disableJaeger: true
+
+smcpVersion: v2.6
+
+wildcardDomains:
+  - name: engg
+    domain: sm.apps.strl-ocp-engg-1.unit.apptoapp.net
+
+routeloadbalance: true
+
+additionalIngress:
+  - shortid: engg
+
+dnsName: "apps.strl-ocp-engg-1.unit.apptoapp.net"
+
+istiod:
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "1Gi"
+  autoScaling:
+    minReplicas: 1
+    maxReplicas: 2
+#ossmFederation:
+#  trustDomain: ocp-engg-1
+#  additionalGateways:
+#  - name: vesunitaro001
+#    remote:
+#      addresses:
+#      - 10.151.6.19
+#    import:
+#      selectors:
+#      - type: NameSelector
+#        name: myqubitge-domain
+#        namespace: ws-mvo-unit
+

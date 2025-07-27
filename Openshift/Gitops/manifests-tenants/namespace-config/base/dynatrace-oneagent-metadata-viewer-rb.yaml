@@ -1,0 +1,19 @@
+# This rolebinding is for dynatrace reading pod config to enable dynatrace console filtering
+# the name is a place holder. each kustomization file needs to replace it with the service account in each
+# application namespace in the cluster
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+  name: dynatrace-oneagent-metadata-viewer-rb
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: dynatrace-oneagent-metadata-viewer
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: system:serviceaccounts:namespace
+
+

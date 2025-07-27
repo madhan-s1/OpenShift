@@ -1,0 +1,9 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- app-conjur-clusterrole-ns.yaml
+- app-conjur-serviceaccount-ns.yaml
+#- conjur-config-app-namespace-prep.yaml
+
+

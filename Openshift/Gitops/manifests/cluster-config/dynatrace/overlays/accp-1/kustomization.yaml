@@ -1,0 +1,36 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+bases:
+- ../../base
+
+resources:
+- dynatrace-secret.yaml
+
+patches:
+  - target:
+      version: v1beta1
+      kind: DynaKube
+      name: dynakube-name
+      namespace: dynatrace
+    patch: |-
+      - op: replace
+        path: /metadata/name
+        value: strl-ocp-accp-1
+      - op: replace
+        path: /spec/apiUrl
+        value: https://rcm85522.live.dynatrace.com/api
+      - op: replace
+        path: /spec/networkZone
+        value: accp
+      - op: replace
+        path: /spec/activeGate/group
+        value: accp
+      - op: replace
+        path: /spec/oneAgent/classicFullStack/args/0
+        value: --set-host-group=accp
+      - op: add
+        path: /spec/oneAgent/classicFullStack/version
+        value: 1.307.61.20250226-155505
+
+

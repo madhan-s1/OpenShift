@@ -1,0 +1,11 @@
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+    olm.providedAPIs: IBMSecurityVerifyAccess.v1.ibm.com
+  name: ibm-isva-operator
+  namespace: ibm-isva-operator
+spec:
+  upgradeStrategy: Default
+

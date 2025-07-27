@@ -1,0 +1,45 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: isva-appadmin
+  namespace: ws-isva-core
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  - secrets
+  verbs:
+  - get
+  - list
+  - delete
+  - create
+- apiGroups:
+  - '*'
+  resources:
+  - deployments
+  verbs:
+  - get
+  - list
+  - watch
+  - update
+  - patch
+  - create
+- apiGroups:
+  - ""
+  resources:
+  - pods/log
+  - namespaces
+  verbs:
+  - get
+- apiGroups:
+  - apps
+  resources:
+  - deployments/scale
+  - statefulset/scale
+  verbs:
+  - get
+  - update
+  - patch
+
+

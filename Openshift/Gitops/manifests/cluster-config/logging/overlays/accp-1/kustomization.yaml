@@ -1,0 +1,60 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+# - ../../base
+- olo-og.yaml
+- olo-sub.yaml
+- olo-namespace.yaml
+- olo-instance.yaml
+
+patches:
+  - target:
+      version: v1
+      kind: ClusterLogging
+      name: instance
+      namespace: openshift-logging
+    patch: |-
+      # - op: replace
+      #   path: /spec/logStore/elasticsearch/resources/limits/cpu
+      #   value: 4500m
+      # - op: replace
+      #   path: /spec/logStore/elasticsearch/resources/limits/memory
+      #   value: 16Gi
+      # - op: replace
+      #   path: /spec/logStore/elasticsearch/resources/requests/cpu
+      #   value: 500m
+      # - op: replace
+      #   path: /spec/logStore/elasticsearch/resources/requests/memory
+      #   value: 16Gi
+      # - op: replace
+      #   path: /spec/logStore/elasticsearch/storage/size
+      #   value: 500G
+      # - op: replace
+      #   path: /spec/logStore/elasticsearch/storage/storageClassName
+      #   value: thin-csi
+      # - op: replace
+      #   path: /spec/logStore/retentionPolicy/application/maxAge
+      #   value: 1d
+      # - op: replace
+      #   path: /spec/logStore/retentionPolicy/audit/maxAge
+      #   value: 1d
+      # - op: replace
+      #   path: /spec/logStore/retentionPolicy/infra/maxAge
+      #   value: 1d
+      - op: add
+        path: /spec/collection
+        value:
+          tolerations:
+          - effect: NoSchedule
+            operator: Exists
+          type: vector        
+          resources:
+            limits:
+              memory: 1.5Gi
+              cpu: 1500m
+            requests:
+              memory: 500Mi
+              cpu: 500m
+
+

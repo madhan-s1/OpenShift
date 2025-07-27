@@ -1,0 +1,14 @@
+{{- if .Values.ossmFederation }}
+{{- range $gateway := .Values.ossmFederation.additionalGateways }}
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ $gateway.name }}-ca-root-cert
+  namespace: istio-system
+data:
+  root-cert.pem: |
+    {{- $.Files.Get (printf "federation-cacerts/%s.crt" $gateway.name) | nindent 6 }}
+---
+{{- end }}
+{{- end }}
+

@@ -1,0 +1,93 @@
+apiVersion: loki.grafana.com/v1
+kind: LokiStack
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "6"
+  name: lokistack
+  namespace: openshift-logging
+spec:
+  template:
+    compactor:
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+      tolerations:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/infra
+        operator: Exists
+    distributor:
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+      tolerations:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/infra
+        operator: Exists
+    gateway:
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+      tolerations:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/infra
+        operator: Exists
+    indexGateway:
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+      tolerations:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/infra
+        operator: Exists
+    ingester:
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+      tolerations:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/infra
+        operator: Exists
+    querier:
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+      tolerations:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/infra
+        operator: Exists
+    queryFrontend:
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+      tolerations:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/infra
+        operator: Exists
+    ruler:
+      nodeSelector:
+        node-role.kubernetes.io/infra: ""
+      tolerations:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/infra
+        operator: Exists
+  tenants:
+    mode: openshift-logging
+  managementState: Managed
+  limits:
+    global:
+      queries:
+        queryTimeout: 3m
+      retention:
+        days: 2
+      ingestion:
+        ingestionBurstSize: 16
+        ingestionRate: 8
+  storage:
+    schemas:
+      - effectiveDate: '2024-04-02'
+        version: v13
+    tls:
+      caKey: service-ca.crt
+      caName: openshift-service-ca.crt
+    secret:
+      name: logging-loki-odf
+      type: s3
+  hashRing:
+    type: memberlist
+  size: 1x.extra-small
+  storageClassName: thin-csi
+
+

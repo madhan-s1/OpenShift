@@ -1,0 +1,34 @@
+---
+# tasks file for ocp_validation
+
+- debug:
+    msg: "Openshift Cluster Validation - Checking requirements"
+
+- pause:
+    seconds: 5
+
+- name: ocp_validation | main.yaml | Validate ansible collections
+  ansible.builtin.shell: |
+    ansible-galaxy collection install community.okd
+    ansible-galaxy collection install kubernetes.core
+
+- name: ocp_validation | main.yaml | Including requirements
+  ansible.builtin.include_tasks:
+    file: ocp_validation_requirements.yaml
+
+- debug:
+    msg: "Openshift Cluster Validation - Starting validation"
+
+- pause:
+    seconds: 5
+
+- name: ocp_validation | main.yaml | ClusterOperator check
+  ansible.builtin.command: oc get co
+  register: ocp_validation_co_status
+
+- name: ocp_validation | main.yaml | Including validation
+  ansible.builtin.include_tasks:
+    file: ocp_validation_co.yaml
+  loop: "{{ ocp_validation_co }}"
+
+

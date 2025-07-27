@@ -1,0 +1,59 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wildapps
+  namespace: cert-manager
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  secretName: wildapps
+  commonName: "*.apps.strl-ocp-accp-2.accp.apptoapp.net"
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS1
+    size: 2048
+  usages:
+    - client auth
+    - server auth
+    - digital signature
+    - key encipherment
+  subject:
+    organizations:
+      - "qubit Services Company"
+    organizationalUnits:
+      - "qubit Information Trust Services"
+    localities:
+      - "Atlanta"
+    provinces:
+      - "Georgia"
+    countries:
+      - "US"
+  duration: 17520h0m0s
+  renewBefore: 168h0m0s
+  dnsNames:
+    - "*.apps.strl-ocp-accp-2.accp.apptoapp.net"
+  issuerRef:
+    kind: ClusterIssuer
+    name: venafi-tpp-cluster-issuer
+    group: cert-manager.io
+
+---
+apiVersion: trust.cert-manager.io/v1alpha1
+kind: Bundle
+metadata:
+  name: custom-ca
+  annotations:
+    argocd.argoproj.io/sync-wave: "4"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  sources:
+    - secret:
+        key: ca.crt
+        name: wildapps
+  target:
+    configMap:
+      key: ca-bundle.crt
+    namespaceSelector:
+      matchLabels:
+        kubernetes.io/metadata.name: openshift-config

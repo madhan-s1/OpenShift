@@ -1,0 +1,5 @@
+dependencies:
+- name: cert-manager
+  repository: "file://../charts"
+  version: v1.0.0
+

@@ -1,0 +1,41 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources: []
+#- ../../base
+#- olo-og.yaml
+#- olo-sub.yaml
+#- olo-namespace.yaml
+#- olo-instance.yaml
+#- odf-namespace.yaml
+#- odf-og.yaml
+#- odf-sub.yaml
+##- mcg-sub.yaml
+##- ocs-sub.yaml
+##- odf-csi-addons-sub.yaml
+## - loki-sub.yaml
+#- odf-ss.yaml
+#- odf-storage-cluster.yaml
+## - object-bucket-claim.yaml
+## - lokistack.yaml
+
+
+#patchesJson6902:
+#- target:
+#    group: logging.openshift.io
+#    kind: ClusterLogging
+#    name: instance
+#    namespace: openshift-logging
+#  path: ./olo-instance.yaml
+
+# patches:
+# - target:
+#     version: v1alpha1
+#     kind: Subscription
+#     name: cluster-logging
+#   patch: |-
+#     - op: add
+#       path: /spec/installPlanApproval
+#       value: "Manual"
+
+

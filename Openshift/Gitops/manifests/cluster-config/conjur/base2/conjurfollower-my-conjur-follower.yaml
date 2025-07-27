@@ -1,0 +1,51 @@
+﻿apiVersion: conjur.cyberark.com/v1
+kind: ConjurFollower
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "6"
+  labels:
+    app: conjur-follower
+  name: my-conjur-follower
+  namespace: cyberark-conjur
+spec:
+  configFileFrom:
+    configMapKeyRef:
+      key: conjur.yml
+      name: conjur-config
+  imagePullPolicy: Always
+  images:
+    configurator: >-
+      registry.connect.redhat.com/cyberark/conjur-openshift-follower-configurator@sha256:046d2780de9d0198f4896e894ec19e96f3f8cdba6197e1a075aafb47fedd9d46
+    conjur: >-
+      registry.connect.redhat.com/cyberark/conjur-openshift-follower-conjur@sha256:f36cb13f65154625d97d60397391a19a176c9889a045cc8482fab839699ea201
+    failoverRebaser: >-
+      registry.connect.redhat.com/cyberark/conjur-openshift-follower-failover-rebaser@sha256:0960e717a942c0f2dc0f4f8324d7a9ee57d2ab157570d9c3012af76ce183843a
+    info: >-
+      registry.connect.redhat.com/cyberark/conjur-openshift-follower-info@sha256:f772004fafdedc642ec57b276f066a09524c33d0ae5c9b53d7658c0428db37f6
+    nginx: >-
+      registry.connect.redhat.com/cyberark/conjur-openshift-follower-nginx@sha256:9ac9aee4d129ab9bf71ce491dc9f11dfa617bb54c6457677b284eb1428f9ef25
+    postgres: >-
+      registry.connect.redhat.com/cyberark/conjur-openshift-follower-postgres@sha256:e7f332d06cddebc18cd8251261fa97c5d58c61f587c4c98ebdf8acede0337cb4
+    syslogNg: >-
+      registry.connect.redhat.com/cyberark/conjur-openshift-follower-syslog-ng@sha256:6a573fa2054c433a4e4a12e61b6f1cc9550615684729a559a0f910b0b7489608
+  master:
+    account: conjur
+    audience: conjur
+    authentication: authn-k8s
+    authenticatorID: strl-ocp-engg-1
+    authnLogin: host/conjur/authn-k8s/strl-ocp-engg-1/conjur-follower
+    caCertificateFrom:
+      configMapKeyRef:
+        key: conjur-ca.pem
+        name: conjur-cert
+    hostname: conjur-write.accp.apptoapp.net
+  replicas: 2
+  resourceNames:
+    deployment: conjur-follower
+    service: conjur-follower
+    serviceAccount: conjur-follower
+  service:
+    sessionAffinity: None
+    type: ClusterIP
+
+

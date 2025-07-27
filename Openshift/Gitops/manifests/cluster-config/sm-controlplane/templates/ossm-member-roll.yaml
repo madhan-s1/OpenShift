@@ -1,0 +1,19 @@
+# add a project to ossm ServiceMeshMemberRoll
+apiVersion: maistra.io/v1
+kind: ServiceMeshMemberRoll
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "7"
+  finalizers:
+    - maistra.io/istio-operator
+  name: default
+  namespace: istio-system
+spec:
+  members:
+    {{- range $.Values.members }}
+    - {{ . }}
+    {{- end }}
+
+
+
+

@@ -1,0 +1,119 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+bases:
+- ../../base2
+
+patches:
+  - target:
+      version: v1 
+      kind: ConjurFollower 
+    patch: |-
+      - op: replace
+        path: /spec/master/authenticatorID
+        value: strl-ocp-engg-1
+      - op: replace
+        path: /spec/master/authnLogin
+        value: host/conjur/authn-k8s/strl-ocp-engg-1/conjur-follower
+      - op: replace
+        path: /spec/master/hostname
+        value: conjur-write.unit.apptoapp.net
+  - target:
+      version: v1 
+      kind: ConfigMap 
+      name: conjur-config
+      namespace: cyberark-conjur 
+    patch: |-
+      - op: replace
+        path: /data/conjur.yml
+        value: |
+                authenticators:
+                  - authn
+                  - authn-k8s/strl-ocp-engg-1
+  - target:
+      version: conjur.cyberark.com/v1 
+      kind: ConjurFollower
+      name: my-conjur-follower
+      namespace: cyberark-conjur 
+    patch: |-
+      - op: replace
+        path: /spec/master/authenticatorID
+        value: strl-ocp-engg-1
+      - op: replace
+        path: /spec/master/authnLogin
+        value: host/conjur/authn-k8s/strl-ocp-engg-1/conjur-follower
+      - op: replace
+        path: /spec/master/hostname
+        value: conjur-write.unit.apptoapp.net
+      # - op: replace
+      #   path: /spec/images/configurator
+      #   value: registry.connect.redhat.com/cyberark/conjur-openshift-follower-configurator@sha256:046d2780de9d0198f4896e894ec19e96f3f8cdba6197e1a075aafb47fedd9d46
+      # - op: replace
+      #   path: /spec/images/conjur
+      #   value: registry.connect.redhat.com/cyberark/conjur-openshift-follower-conjur@sha256:f36cb13f65154625d97d60397391a19a176c9889a045cc8482fab839699ea201
+      # - op: replace
+      #   path: /spec/images/failoverRebaser
+      #   value: registry.connect.redhat.com/cyberark/conjur-openshift-follower-failover-rebaser@sha256:0960e717a942c0f2dc0f4f8324d7a9ee57d2ab157570d9c3012af76ce183843a
+      # - op: replace
+      #   path: /spec/images/info
+      #   value: registry.connect.redhat.com/cyberark/conjur-openshift-follower-info@sha256:f772004fafdedc642ec57b276f066a09524c33d0ae5c9b53d7658c0428db37f6
+      # - op: replace
+      #   path: /spec/images/nginx
+      #   value: registry.connect.redhat.com/cyberark/conjur-openshift-follower-nginx@sha256:9ac9aee4d129ab9bf71ce491dc9f11dfa617bb54c6457677b284eb1428f9ef25
+      # - op: replace
+      #   path: /spec/images/postgres
+      #   value: registry.connect.redhat.com/cyberark/conjur-openshift-follower-postgres@sha256:e7f332d06cddebc18cd8251261fa97c5d58c61f587c4c98ebdf8acede0337cb4
+      # - op: replace
+      #   path: /spec/images/syslogNg
+      #   value: registry.connect.redhat.com/cyberark/conjur-openshift-follower-syslog-ng@sha256:6a573fa2054c433a4e4a12e61b6f1cc9550615684729a559a0f910b0b7489608
+
+configMapGenerator:
+- name: conjur-connect
+  namespace: cyberark-conjur
+  options:
+    annotations:
+      argocd.argoproj.io/sync-wave: "4"
+    labels:
+      app.kubernetes.io/name: "conjur-connect-configmap"
+      app.kubernetes.io/instance: "conjur-default-configmap"
+      app.kubernetes.io/part-of: "conjur-config"
+      conjur.org/name: "conjur-connect-configmap" 
+  literals:
+  - CONJUR_ACCOUNT=conjur
+  - CONJUR_APPLIANCE_URL=https://conjur-follower.cyberark-conjur.svc.cluster.local
+  - CONJUR_AUTHN_URL=https://conjur-follower.cyberark-conjur.svc.cluster.local/authn-k8s/strl-ocp-engg-1 
+  files:
+  - CONJUR_SSL_CERTIFICATE=conjur-follower-public.crt
+- name: conjur-configmap
+  namespace: cyberark-conjur
+  options:
+    annotations:
+      argocd.argoproj.io/sync-wave: "5"
+    labels:
+      release: cluster-prep
+      app.kubernetes.io/name: "conjur-golden-configmap"
+      app.kubernetes.io/component: "conjur-reference-config"
+      app.kubernetes.io/instance: "conjur-golden-configmap"
+      app.kubernetes.io/part-of: "conjur-config"
+      conjur.org/name: "conjur-golden-configmap"
+  literals:
+  - authnK8sAuthenticatorID=strl-ocp-engg-1
+  - authnK8sClusterRole=conjur-clusterrole
+  - authnK8sServiceAccount=conjur-serviceaccount
+  - conjurAccount=conjur
+  - conjurApplianceUrl=https://conjur-follower.cyberark-conjur.svc.cluster.local
+  files:
+  - conjurSslCertificate=conjur-follower-public.crt
+- name: conjur-cert
+  namespace: cyberark-conjur
+  options:
+    annotations:
+      argocd.argoproj.io/sync-wave: "6"
+  files:
+  - conjur-ca.pem=conjur-follower-public.crt
+generatorOptions:
+  disableNameSuffixHash: true
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+
+

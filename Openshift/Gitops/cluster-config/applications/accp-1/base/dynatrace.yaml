@@ -1,0 +1,49 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: config-dynatrace
+  namespace: openshift-gitops
+spec:
+  destination:
+    namespace: openshift-gitops
+    server: https://kubernetes.default.svc
+  project: cluster-config
+  source:
+    path: Gitops/manifests/cluster-config/dynatrace/overlays/accp-1
+    repoURL: https://github.com/madhan-s1/OpenShift
+    targetRevision: master
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+  ignoreDifferences:
+    - kind: ServiceAccount
+      name: dynatrace-dynakube-oneagent
+      namespace: dynatrace
+      jsonPointers:
+        - /imagePullSecrets
+    - kind: ServiceAccount
+      name: dynatrace-operator
+      namespace: dynatrace
+      jsonPointers:
+        - /imagePullSecrets
+    - kind: ServiceAccount
+      name: dynatrace-webhook
+      namespace: dynatrace
+      jsonPointers:
+        - /imagePullSecrets
+    - group: security.openshift.io
+      kind: SecurityContextConstraints
+      name: dynatrace-activegate
+      jsonPointers:
+        - /volumes
+    - group: security.openshift.io
+      kind: SecurityContextConstraints
+      name: dynatrace-operator
+      jsonPointers:
+        - /volumes
+    - group: security.openshift.io
+      kind: SecurityContextConstraints
+      name: dynatrace-webhook
+      jsonPointers:
+        - /volumes

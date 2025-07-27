@@ -1,0 +1,38 @@
+# {{- if contains "intg" .Values.dnsName}}
+# kind: Route
+# apiVersion: route.openshift.io/v1
+# metadata:
+#   annotations:
+#     argocd.argoproj.io/sync-wave: "6"
+#     haproxy.router.openshift.io/hsts_header: max-age=31536000;includeSubDomains;preload
+#   name: istio-ingressgateway-intg
+#   namespace: istio-system
+#   labels:
+#     app: istio-ingressgateway
+#     app.kubernetes.io/part-of: istio
+#     app.kubernetes.io/instance: istio-system
+#     maistra.io/owner-name: ossm-controlplane
+#     release: istio
+#     app.kubernetes.io/version: 2.3.1-1-3
+#     app.kubernetes.io/component: istio-ingress
+#     maistra-version: 2.2.5
+#     istio: ingressgateway
+#     app.kubernetes.io/managed-by: maistra-istio-operator
+#     maistra.io/owner: istio-system
+#     app.kubernetes.io/name: istio-ingress
+# spec:
+#   host: >-
+#     istio-ingressgateway-intg.{{ $.Values.dnsName }}
+#   to:
+#     kind: Service
+#     name: istio-ingressgateway
+#     weight: 100
+#   port:
+#     targetPort: http2
+#   tls:
+#     termination: edge
+#     insecureEdgeTerminationPolicy: Redirect
+#   wildcardPolicy: None
+# {{- end}}
+
+

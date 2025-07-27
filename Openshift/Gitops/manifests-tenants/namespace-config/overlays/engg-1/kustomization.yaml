@@ -1,0 +1,13 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+bases:
+- default
+- ws-sandbox-1 
+- ws-b2b-unit-domain
+- ws-b2c-unit-domain
+- ws-b2c-unit-edge  
+- ws-sandbox-2
+- ws-sandbox-3
+
+

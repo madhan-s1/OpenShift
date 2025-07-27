@@ -1,0 +1,11 @@
+kind: Secret
+apiVersion: v1
+metadata:
+  name: smbcreds
+  namespace: {{ .Release.Namespace }}
+data:
+  domain: {{ .Values.smbcreds.domain }}
+  password: {{ .Values.smbcreds.password }}
+  username: {{ .Values.smbcreds.username }}
+type: Opaque
+

@@ -1,0 +1,41 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: istio-system-read
+rules:
+- apiGroups:
+  - '*'
+  resources:
+  - pods
+  - pods/log
+  - services
+  - routes
+  - namespaces
+  verbs:
+    - get
+    - list
+    - watch
+- verbs:
+    - get
+    - list
+    - watch
+  apiGroups:
+    - authentication.istio.io
+    - config.istio.io
+    - networking.istio.io
+    - rbac.istio.io
+    - security.istio.io
+    - authentication.maistra.io
+    - rbac.maistra.io
+  resources:
+    - '*'
+- verbs:
+    - get
+    - list
+    - watch
+  apiGroups:
+    - maistra.io
+  resources:
+    - servicemeshextensions
+
+

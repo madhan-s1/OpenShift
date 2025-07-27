@@ -1,0 +1,34 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: ldap-group-syncer
+  namespace: ldap-sync
+data:
+  sync.yaml: |
+    kind: LDAPSyncConfig
+    apiVersion: v1
+    url: ldaps://intldsp.entlds.apptoapp.net:636
+    insecure: false
+    bindDN: "CN=S700232,OU=Users,DC=IntLDSP,DC=EntLDS,DC=apptoapp,DC=net"
+    bindPassword:
+      file: "/etc/secrets/bindPassword"
+    ca: /etc/ldap-ca/ca.crt
+    rfc2307:
+      groupsQuery:
+        baseDN: "DC=IntLDSP,DC=EntLDS,DC=apptoapp,DC=net"
+        scope: sub
+        filter: (CN=OCP*)
+        derefAliases: never
+      groupUIDAttribute: dn 
+      groupNameAttributes: [ cn ] 
+      groupMembershipAttributes: [ member ] 
+      usersQuery:
+        baseDN: "DC=IntLDSP,DC=EntLDS,DC=apptoapp,DC=net"
+        scope: sub
+        derefAliases: never
+      userUIDAttribute: dn 
+      userNameAttributes: [ cn ] 
+      tolerateMemberNotFoundErrors: false
+      tolerateMemberOutOfScopeErrors: false
+
+

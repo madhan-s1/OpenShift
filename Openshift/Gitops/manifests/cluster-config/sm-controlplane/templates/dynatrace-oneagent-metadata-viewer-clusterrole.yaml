@@ -1,0 +1,14 @@
+# This clusterrole is needed for dynatrace to read pod info in app namespaces to enable filtering on
+# dynatrace console. Each rolebind needs to be added to the service account of each app namespace.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: dynatrace-oneagent-metadata-viewer
+rules:
+- apiGroups:
+  - '*'
+  resources:
+  - pods
+  verbs:
+    - get
+

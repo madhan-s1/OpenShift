@@ -1,0 +1,65 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+bases:
+- ../../base
+
+resources:
+- dynatrace-secret.yaml
+
+patches:
+  - target:
+      version: v1beta1
+      kind: DynaKube
+      name: dynakube-name
+      namespace: dynatrace
+    patch: |-
+      - op: replace
+        path: /metadata/name
+        value: shk-ocp-prod-2 
+      - op: replace
+        path: /spec/apiUrl
+        value: https://hkv68108.live.dynatrace.com/api 
+      - op: replace
+        path: /spec/networkZone
+        value: prod
+      - op: replace
+        path: /spec/activeGate/group
+        value: prod
+      - op: replace
+        path: /spec/oneAgent/classicFullStack/args/0
+        value: --set-host-group=prod
+  - target:
+      version: v1
+      kind: Deployment
+      name: dynatrace-operator
+      namespace: dynatrace
+    patch: |-
+      - op: add
+        path: "/spec/template/spec/nodeSelector"
+        value:          
+          node-role.kubernetes.io/infra: ""
+      - op: add
+        path: "/spec/template/spec/tolerations/-"
+        value:
+          effect: NoSchedule
+          key: node-role.kubernetes.io/infra
+          operator: Exists
+  - target:
+      version: v1
+      kind: Deployment
+      name: dynatrace-webhook
+      namespace: dynatrace
+    patch: |-
+      - op: add
+        path: "/spec/template/spec/nodeSelector"
+        value:          
+          node-role.kubernetes.io/infra: ""
+      - op: add
+        path: "/spec/template/spec/tolerations/-"
+        value:
+          effect: NoSchedule
+          key: node-role.kubernetes.io/infra
+          operator: Exists
+
+

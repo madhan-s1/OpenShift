@@ -1,0 +1,20 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- ../../base
+patches:
+  - target:
+      version: v1
+      kind: CronJob
+      name: openshift-backup
+      namespace: ocp-backup-etcd
+    patch: |-
+      - op: replace
+        path: /spec/schedule
+        value: "56 23 * * *"
+      - op: replace
+        path: /spec/jobTemplate/spec/template/spec/containers/0/image
+        value: "registry.redhat.io/openshift4/ose-cli:latest"
+
+

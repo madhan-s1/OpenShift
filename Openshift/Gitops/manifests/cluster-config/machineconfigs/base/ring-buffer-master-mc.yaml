@@ -1,0 +1,27 @@
+apiVersion: machineconfiguration.openshift.io/v1
+kind: MachineConfig
+metadata:
+  labels:
+    machineconfiguration.openshift.io/role: master
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+  name: 99-vsphere-increase-rx-tx-ring-buffer-master
+spec:
+  config:
+    ignition:
+      config: {}
+      security:
+        tls: {}
+      timeouts: {}
+      version: 3.1.0
+    networkd: {}
+    passwd: {}
+    storage:
+      files:
+      - contents:
+          source: data:text/plain;charset=utf-8;base64,IyEvYmluL2Jhc2gKCmRyaXZlcj0kKG5tY2xpIC10IC1tIHRhYnVsYXIgLWYgZ2VuZXJhbC5kcml2ZXIgZGV2IHNob3cgIiR7REVWSUNFX0lGQUNFfSIpCgppZiBbWyAiJDIiID09ICJ1cCIgJiYgIiR7ZHJpdmVyfSIgPT0gInZteG5ldDMiICYmIC1mIC91c3Ivc2Jpbi9ldGh0b29sIF1dOyB0aGVuCiAgbG9nZ2VyIC1zICI5OS12c3BoZXJlLWluY3JlYXNlLXJ4LXR4LXJpbmctYnVmZmVyIHRyaWdnZXJlZCBieSAkezJ9IG9uIGRldmljZSAke0RFVklDRV9JRkFDRX0uIgogIGV0aHRvb2wgLUcgJHtERVZJQ0VfSUZBQ0V9IHJ4IDQwOTYgdHggNDA5NgpmaQo=
+        mode: 484
+        overwrite: true
+        path: /etc/NetworkManager/dispatcher.d/99-vsphere-increase-rx-tx-ring-buffer
+  osImageURL: ""
+

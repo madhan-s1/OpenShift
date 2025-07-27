@@ -1,0 +1,29 @@
+{{- if .Values.wildcardDomains }}
+{{- range $entry := .Values.wildcardDomains }}
+---
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: sm-gateway-wildcard-{{ $entry.name }}
+  namespace: istio-system
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+    argocd.argoproj.io/sync-wave: "7"
+spec:
+  selector:
+    istio: ingressgateway-{{ $entry.name }}
+  servers:
+    - hosts:
+      - '*.{{ $entry.domain }}'
+      port:
+        name: https
+        number: 443
+        protocol: HTTPS
+      tls:
+        credentialName: sm-wildcard-cert
+        mode: SIMPLE
+
+{{- end }}
+{{- end }}
+
+

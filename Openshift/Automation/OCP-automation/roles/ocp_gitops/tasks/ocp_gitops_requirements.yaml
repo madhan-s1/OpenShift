@@ -1,0 +1,47 @@
+---
+# tasks file for ocp_gitops
+
+- name: ocp_gitops | ocp_gitops_requirements.yaml | Validate pip requirementes
+  pip:
+    name:
+      - kubernetes
+    executable: pip3
+    extra_args: --user
+
+- name: ocp_gitops | ocp_gitops_requirements.yaml | Removing OCP clusters configured
+  ansible.builtin.file:
+    path: ~/.kube
+    state: absent
+
+- name: ocp_gitops | ocp_gitops_requirements.yaml | Loading environment vars
+  ansible.builtin.include_vars:
+    file: "{{ ocp_gitops_environment }}.yaml"
+
+- name: ocp_gitops | ocp_gitops_requirements.yaml | Validate OCP authentication
+  community.okd.openshift_auth:
+    username: "{{ ocp_gitops_openshift_admin_user }}"
+    password: "{{ ocp_gitops_openshift_admin_password }}"
+    host: "{{ ocp_gitops_openshift_host }}"
+    validate_certs: no
+
+- name: ocp_gitops | ocp_gitops_requirements.yaml | Validate OCP authentication through CLI
+  ansible.builtin.shell: |
+    oc logout
+    oc login --server="{{ ocp_gitops_openshift_host }}" -u "{{ ocp_gitops_openshift_admin_user }}" -p "{{ ocp_gitops_openshift_admin_password }}" --insecure-skip-tls-verify=true
+
+- name: ocp_gitops | ocp_gitops_requirements.yaml | Get OCP cluster
+  ansible.builtin.shell: |
+    oc cluster-info | grep api | awk '{print $7}'
+  register: ocp_gitops_cluster_name
+
+- name: ocp_gitops | ocp_gitops_requirements.yaml | Validate cluster connection through CLI
+  ansible.builtin.assert:
+    that:
+      - ocp_gitops_cluster_name.stdout is search ('{{ ocp_gitops_openshift_host }}')
+    fail_msg: "Connected to {{ ocp_gitops_cluster_name.stdout }} cluster, verify the connection through CLI"
+    success_msg: "Connected to {{ ocp_gitops_cluster_name.stdout }} cluster, proceeding.."
+
+- pause:
+    seconds: 15
+
+

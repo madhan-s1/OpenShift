@@ -1,0 +1,126 @@
+defaultingress: ingressgateway
+defaultegress: egressgateway
+manageNetworkPolicy: true
+loglevel: warn
+
+members:
+  - ws-b2b-intg-edge
+  - ws-b2b-intg-domain
+  - ws-b2c-intg-edge
+  - ws-b2c-intg-domain
+  - ws-op-intg-domain
+  - ws-ivr-intg-domain
+  - ws-ivr-intg-edge
+  - ws-vpc-intg-domain
+  - ws-vpc-intg-edge
+  - ws-mpm-intg-domain
+  - ws-mdm-intg-edge
+  - ws-mdm-intg-domain
+  - ws-hcentral-intg-domain
+  - ws-tms-intg
+  - ws-hav-intg-domain
+  - ws-sav-intg-domain
+  - ws-gnl-intg-domain
+  - ws-clmptb-intg-domain
+  - ws-vpa-intg-domain
+  - ws-gpd-intg-domain
+  - ws-esl-intg-domain
+  - ws-rwm-api-intg
+  - ws-b2bpais-intg-domain
+  - ws-swift-intg-domain
+  - ws-pnc-intg
+  - ws-ems-intg-domain
+  - ws-accon-intg-domain
+  - ws-caseupdt-intg-domain
+  - ws-b2b-admin-intg-edge
+  - ws-fdtpa-intg-domain
+  - ws-ops-intg-edge
+  - ws-fndops-intg-edge
+  - ws-bko-intg-edge
+  - ws-fndops-intg-domain
+  - ws-sec-intg-edge
+  - ws-bko-intg-domain
+  - ws-ops-intg-domain
+disableJaeger: true
+
+smcpVersion: v2.6
+
+wildcardDomains:
+  - name: unit-intg
+    domain: sm.apps.strl-ocp-unit-intg-1.intg.apptoapp.net
+  - name: unit
+    domain: unit.sm.apps.strl-ocp-unit-intg-1.intg.apptoapp.net
+  - name: intg
+    domain: intg.sm.apps.strl-ocp-unit-intg-1.intg.apptoapp.net
+
+routetimeout: 120s
+routeloadbalance: true
+
+istiod:
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "1Gi"
+  autoScaling:
+    minReplicas: 2
+    maxReplicas: 4
+
+additionalIngress:
+  - shortid: unit-my3
+  - shortid: unit-my4
+  - shortid: unit-my5
+  - shortid: intg-my3
+  - shortid: intg-my4
+  - shortid: intg-my5
+  - shortid: unit-intg
+  - shortid: unit-wct
+  - shortid: intg-wct
+  - shortid: unit
+    resources:
+      cpu: 300m
+      memory: 1Gi
+    limits:
+      cpu: 1
+      memory: 1500Mi
+    autoScaling:
+      minReplicas: 2
+      maxReplicas: 4
+  - shortid: intg
+    resources:
+      cpu: 300m
+      memory: 1Gi
+    limits:
+      cpu: 1
+      memory: 1500Mi
+    autoScaling:
+      minReplicas: 2
+      maxReplicas: 4
+
+dnsName: "apps.strl-ocp-unit-intg-1.intg.apptoapp.net"
+appGroupNames:
+  - G-OCP-B2C-NonProd
+  - G-OCP-B2B-NonProd
+  - G-OCP-EB-NonProd
+  - G-OCP-CORP-NonProd
+  - G-OCP-APPOPS
+  - G-OCP-IVR-NonProd
+  - G-OCP-HCENTRAL-NonProd
+  - G-OCP-EDPSHARED-NonProd
+  - G-OCP-OPS-NonProd
+  - G-OCP-FNDOPS-NonProd
+  - G-OCP-BKO-NonProd
+  - G-OCP-SEC-NonProd
+
+# ossmFederation:
+#   trustDomain: ocp-unit-intg-1
+#   additionalGateways:
+#   - name: vesunitaro001
+#     remote:
+#       addresses:
+#       - 10.151.6.24
+#   - name: vesunitaro002
+#     remote:
+#       addresses:
+#       - 10.151.182.24
+
+

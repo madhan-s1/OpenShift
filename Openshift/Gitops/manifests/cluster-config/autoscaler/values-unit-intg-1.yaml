@@ -1,0 +1,26 @@
+cluster:
+  autoscale:
+    resources:
+      maxNodesTotal: 59
+      minCoreNumber: 8
+      maxCoreNumber: 496
+      minMemory: 32
+      maxMemory: 1792
+
+machine:
+  machineSets:
+  - names: 
+    - strl-ocp-unit-intg-1-67vfw-worker-hp
+    replicas:
+      min: 31
+      max: 31
+  # - names: 
+  #   - strl-ocp-unit-intg-1-67vfw-worker
+  #   replicas:
+  #     min: 3
+  #     max: 5
+
+
+
+
+

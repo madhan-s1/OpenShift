@@ -1,0 +1,20 @@
+# The Conjur follower ConfigMap contains references to Conjur leader credentials,
+# These configuration values are loaded by the Conjur process at startup and can
+# be overridden by providing environment variables of the same name prefixed by
+# CONJUR. For example, you can override the trusted_proxies value from this
+# file by setting CONJUR_TRUSTED_PROXIES in the environment.
+#
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "5"
+  name: conjur-config
+  namespace: cyberark-conjur
+data:
+  conjur.yml: >
+    authenticators:
+      - authn
+      - authn-k8s/strl-ocp-engg-1
+
+

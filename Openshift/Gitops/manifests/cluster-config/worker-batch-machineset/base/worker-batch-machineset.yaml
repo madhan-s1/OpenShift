@@ -1,0 +1,57 @@
+apiVersion: machine.openshift.io/v1beta1
+kind: MachineSet
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+  labels:
+    machine.openshift.io/cluster-api-cluster: infrastructure_id
+  name: worker-batch-machineset
+  namespace: openshift-machine-api
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      machine.openshift.io/cluster-api-cluster: infrastructure_id
+      machine.openshift.io/cluster-api-machineset: infrastructure_id-worker-batch
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        machine.openshift.io/cluster-api-cluster: infrastructure_id
+        machine.openshift.io/cluster-api-machine-role: worker
+        machine.openshift.io/cluster-api-machine-type: worker
+        machine.openshift.io/cluster-api-machineset: infrastructure_id-worker-batch
+    spec:
+      metadata:
+        labels:
+          node-role.kubernetes.io/worker-batch: ""
+      taints:
+      - key: node-role.kubernetes.io/worker-batch
+        effect: NoSchedule
+      providerSpec:
+        value:
+          apiVersion: machine.openshift.io/v1beta1 
+          credentialsSecret:
+            name: vsphere-cloud-credentials
+          diskGiB: 100
+          kind: VSphereMachineProviderSpec
+          memoryMiB: 49152
+          metadata:
+            creationTimestamp: null
+          network:
+            devices:
+            - networkName: vm_network_name
+          numCPUs: 8
+          numCoresPerSocket: 2
+          snapshot: ""
+          template: vm_template_name
+          userDataSecret:
+            name: worker-user-data
+          workspace:
+            datacenter: CLOUD
+            datastore: vcenter_datastore_name
+            folder: /CLOUD/vm/RHO
+            resourcePool: vsphere_resource_pool
+            server: jvcewvvc9702.dsglobal.org
+
+

@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: sid-creds
+  namespace: cert-manager
+data:
+  username: {{ .Values.sidCreds.username }}
+  password: {{ .Values.sidCreds.password }}
+type: Opaque
+

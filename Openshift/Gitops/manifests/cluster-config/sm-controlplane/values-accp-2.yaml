@@ -1,0 +1,89 @@
+defaultingress: ingressgateway
+defaultegress: egressgateway
+manageNetworkPolicy: true
+loglevel: error
+
+members:
+  - ws-b2b-accp-edge
+  - ws-b2b-accp-domain
+  - ws-b2c-accp-edge
+  - ws-b2c-accp-domain
+  - ws-op-accp-domain
+  - ws-ivr-accp-domain
+  - ws-ivr-accp-edge
+  - ws-vpc-accp-domain
+  - ws-vpc-accp-edge
+  - ws-mdm-accp-edge
+  - ws-mdm-accp-domain
+  - ws-hcentral-accp-domain
+  - ws-tms-accp
+  - ws-hav-accp-domain
+  - ws-sav-accp-domain
+  - ws-gnl-accp-domain
+  - ws-clmptb-accp-domain
+  - ws-vpa-accp-domain
+  - ws-gpd-accp-domain
+  - ws-esl-accp-domain
+  - ws-rwm-api-accp
+  - ws-b2bpais-accp-domain
+  - ws-swift-accp-domain
+  - ws-pnc-accp
+  - ws-ems-accp-domain
+  - ws-accon-accp-domain
+  - ws-caseupdt-accp-domain
+  - ws-b2b-admin-accp-edge
+  - ws-fdtpa-accp-domain
+  - ws-ops-accp-edge
+  - ws-fndops-accp-edge
+  - ws-bko-accp-edge
+  - ws-fndops-accp-domain
+  - ws-sec-accp-edge
+  - ws-bko-accp-domain
+  - ws-ops-accp-domain
+disableJaeger: true
+
+smcpVersion: v2.6
+
+wildcardDomains:
+  - name: accp
+    domain: sm.apps.strl-ocp-accp-2.accp.apptoapp.net
+
+routeloadbalance: true
+
+istiod:
+  resources:
+    requests:
+      cpu: 1
+      memory: "1.6Gi"
+  autoScaling:
+    minReplicas: 3
+    maxReplicas: 7
+
+additionalIngress:
+  - shortid: accp
+    resources:
+      cpu: 500m
+      memory: 1500Mi
+    limits:
+      cpu: 2
+      memory: 2Gi
+    autoScaling:
+      minReplicas: 3
+      maxReplicas: 7
+
+dnsName: "apps.strl-ocp-accp-2.accp.apptoapp.net"
+appGroupNames:
+  - G-OCP-B2C-NonProd
+  - G-OCP-B2B-NonProd
+  - G-OCP-EB-NonProd
+  - G-OCP-CORP-NonProd
+  - G-OCP-APPOPS
+  - G-OCP-IVR-NonProd
+  - G-OCP-HCENTRAL-NonProd
+  - G-OCP-EDPSHARED-NonProd-AppAdmin
+  - G-OCP-EDPSHARED-NonProd
+  - G-OCP-OPS-NonProd
+  - G-OCP-FNDOPS-NonProd
+  - G-OCP-BKO-NonProd
+  - G-OCP-SEC-NonProd
+

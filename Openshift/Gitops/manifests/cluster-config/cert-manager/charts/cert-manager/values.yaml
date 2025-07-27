@@ -1,0 +1,3 @@
+clusterIssuer:
+  venafi:
+    tppInstanceUrl: https://venafi.qubit.net/vedsdk

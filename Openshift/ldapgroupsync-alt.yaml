@@ -1,0 +1,40 @@
+apiVersion: redhatcop.redhat.io/v1alpha1
+kind: GroupSync
+metadata:
+  name: ldap-groupsync
+spec:
+  schedule: "35 2 * * *"
+  providers:
+  - ldap:
+      credentialsSecret:
+        name: ldap-group-sync
+        namespace: group-sync-operator
+      insecure: false
+      rfc2307:
+        groupMembershipAttributes:
+        - member
+        groupNameAttributes:
+        - cn
+        groupUIDAttribute: cn
+        groupsQuery:
+          baseDN: "DC=IntLDSP,DC=EntLDS,DC=apptoapp,DC=net"
+          derefAliases: never
+          filter: (CN=OCP*)
+          scope: sub
+        tolerateMemberNotFoundErrors: false
+        tolerateMemberOutOfScopeErrors: false
+        userNameAttributes:
+        - cn
+        userUIDAttribute: dn
+        usersQuery:
+          baseDN: "DC=IntLDSP,DC=EntLDS,DC=apptoapp,DC=net"
+          derefAliases: never
+          scope: sub
+      url: ldaps://intldsp.entlds.apptoapp.net:636
+      ca: 
+        kind: ConfigMap
+        name: gsca-config-map
+        namespace: group-sync-operator
+    name: ldap
+
+

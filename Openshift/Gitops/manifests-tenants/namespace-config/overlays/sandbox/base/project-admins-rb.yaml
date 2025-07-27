@@ -1,0 +1,26 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+  name: project-admins
+  namespace: new-namespace
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: admin
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: G-B2B
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: G-B2C
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: G-EB
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: G-CORP
+
+

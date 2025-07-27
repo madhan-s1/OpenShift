@@ -1,0 +1,17 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- cyberark-conjur-ns.yaml
+#- conjuroperator.yaml
+- conjur-config-rb.yaml
+- conjur-serviceaccount.yaml
+#- conjur-configmap-golden-config-map.yaml
+- conjur-clusterrole.yaml
+#- conjur-connect-config-map.yaml
+- conjur-follower-config-map.yaml
+#- conjur-leader-cert-config-map.yaml
+- conjurfollower-my-conjur-follower.yaml
+
+
+

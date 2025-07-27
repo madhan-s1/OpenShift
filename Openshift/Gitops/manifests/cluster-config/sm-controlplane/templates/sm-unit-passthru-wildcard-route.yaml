@@ -1,0 +1,30 @@
+{{- if .Values.wildcardDomains }}
+{{- range $entry := .Values.wildcardDomains }}
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: mesh-wildcard-{{ $entry.name }}
+  namespace: istio-system
+  annotations:
+    haproxy.router.openshift.io/hsts_header: max-age=31536000;includeSubDomains;preload
+    haproxy.router.openshift.io/timeout: {{ $.Values.routetimeout | default "120s" }} 
+    {{- if $.Values.routeloadbalance }}
+    haproxy.router.openshift.io/balance: leastconn
+    {{- end }}
+spec:
+  host: dummy.{{ $entry.domain }}
+  wildcardPolicy: Subdomain
+  port:
+    targetPort: https
+  to:
+    kind: Service
+    name: istio-ingressgateway-{{ $entry.name | default "engg" }}
+    weight: 100
+  tls:
+    termination: passthrough
+    insecureEdgeTerminationPolicy: Redirect
+{{- end }}
+{{- end }}
+
+

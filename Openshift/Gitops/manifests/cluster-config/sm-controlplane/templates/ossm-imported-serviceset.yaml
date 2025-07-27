@@ -1,0 +1,35 @@
+{{- if .Values.ossmFederation }}
+{{- range $gateway := .Values.ossmFederation.additionalGateways }}
+{{- if $gateway.import }}
+apiVersion: federation.maistra.io/v1
+kind: ImportedServiceSet
+metadata:
+  name: {{ $gateway.name }}-mesh
+  namespace: istio-system
+spec:
+  importRules:
+  {{- range $import := $gateway.import.selectors }}
+    - type: NameSelector
+      importAsLocal: false
+      nameSelector:
+        {{- if $import.name }}
+        name: {{ $import.name }}
+        {{- end }}
+        {{- if $import.namespace }}
+        namespace: {{ $import.namespace }}
+        {{- end }}
+        {{- if $import.alias }}
+        alias:
+          {{- if $import.alias.name }}
+          name: {{ $import.alias.name }}
+          {{- end }}
+          {{- if $import.alias.namespace }}
+          namespace: {{ $import.alias.namespace }}
+          {{- end }}
+        {{- end }}
+  {{- end }}
+---
+{{- end }}
+{{- end }}
+{{- end }}
+

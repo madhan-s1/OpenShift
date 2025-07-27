@@ -1,0 +1,69 @@
+{{- if .Values.ossmFederation }}
+{{- range $gateway := .Values.ossmFederation.additionalGateways }}
+{{- if $gateway.export }}
+apiVersion: federation.maistra.io/v1
+kind: ExportedServiceSet
+metadata:
+  name: {{ $gateway.name }}-mesh
+  namespace: istio-system
+spec:
+  exportRules:
+{{- range $export := $gateway.export.selectors }}
+  {{- if eq $export.type "NameSelector" }}
+  - type: NameSelector
+    nameSelector:
+      {{- if $export.name }}
+      name: {{ $export.name }}
+      {{- end }}
+      {{- if $export.namespace }}
+      namespace: {{ $export.namespace }}
+      {{- end }}
+      {{- if $export.alias }}
+      alias:
+        {{- if $export.alias.name }}
+        name: {{ $export.alias.name }}
+        {{- end }}
+        {{- if $export.alias.namespace }}
+        namespace: {{ $export.alias.namespace }}
+        {{- end }}
+      {{- end }}
+  {{- end }}
+  {{- if eq $export.type "LabelSelector" }}
+  - type: LabelSelector
+    labelSelector:
+      namespace: {{ $export.namespace }}
+      selector:
+        matchLabels:
+        {{- range $key, $value := $export.labels }}
+          {{ $key }}: {{ $value }}
+        {{- end }}
+      aliases:
+      {{- range $aliases := $export.aliases }}
+        {{- if and $aliases.name $aliases.namespace }}
+      - name: {{ $aliases.name }}
+        namespace: {{ $aliases.namespace }}
+        {{- else }}
+        {{- if $aliases.name }}
+      - name: {{ $aliases.name }}
+        {{- end }}
+        {{- if $aliases.namespace }}
+      - namespace: {{ $aliases.namespace }}
+        {{- end }}
+        {{- end }}
+       {{- if $aliases.alias }}
+        alias:
+          {{- if $aliases.alias.name }}
+          name: {{ $aliases.alias.name }}
+          {{- end }}
+          {{- if $aliases.alias.namespace }}
+          namespace: {{ $aliases.alias.namespace }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
+  {{- end }}
+{{- end }}
+---
+{{- end }}
+{{- end }}
+{{- end }}
+

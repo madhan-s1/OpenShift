@@ -1,0 +1,38 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+bases:
+- ../../../base
+
+patches:
+- target:
+    version: v1 
+  patch: |-
+    - op: replace
+      path: /metadata/namespace
+      value: ws-b2c-unit-domain 
+
+configMapGenerator:
+- name: conjur-connect
+  namespace: ws-b2c-unit-domain
+  options:
+    annotations:
+      argocd.argoproj.io/sync-wave: "7"
+    labels:
+      app.kubernetes.io/name: "conjur-connect-configmap"
+      app.kubernetes.io/instance: "conjur-default-configmap"
+      app.kubernetes.io/part-of: "conjur-config"
+      conjur.org/name: "conjur-connect-configmap" 
+  literals:
+  - CONJUR_ACCOUNT=conjur
+  - CONJUR_APPLIANCE_URL=https://conjur-follower.cyberark-conjur.svc.cluster.local
+  - CONJUR_AUTHN_URL=https://conjur-follower.cyberark-conjur.svc.cluster.local/authn-k8s/strl-ocp-engg-1
+  - CONJUR_AUTHENTICATOR_ID=strl-ocp-engg-1
+  files:
+  - CONJUR_SSL_CERTIFICATE=conjur-leader-non-prod.pem
+generatorOptions:
+  disableNameSuffixHash: true
+  annotations:
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+
+

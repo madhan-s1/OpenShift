@@ -1,0 +1,59 @@
+apiVersion: ocs.openshift.io/v1
+kind: StorageCluster
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "5"  
+    uninstall.ocs.openshift.io/cleanup-policy: delete
+    uninstall.ocs.openshift.io/mode: graceful
+  finalizers:
+  - storagecluster.ocs.openshift.io
+  name: ocs-storagecluster
+  namespace: openshift-storage  
+spec:
+  nodeSelector:
+    cluster.ocs.openshift.io/openshift-storage: ""
+  tolerations:
+  - effect: NoSchedule
+    key: node.ocs.openshift.io/storage
+    operator: Equal
+    value: "true"
+  resources:
+    mds:
+      limits:
+        cpu: "3"
+        memory: 8Gi
+      requests:
+        cpu: "1"
+        memory: 8Gi
+    rgw:
+      limits:
+        cpu: "2"
+        memory: 4Gi
+      requests:
+        cpu: "1"
+        memory: 4Gi
+  storageDeviceSets:
+  - config: {}
+    count: 1
+    dataPVCTemplate:
+      metadata: {}
+      spec:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 4096Gi
+        storageClassName: thin-csi
+        volumeMode: Block
+      status: {}
+    name: ocs-deviceset-thin-csi
+    replica: 3
+    resources:
+      limits:
+        cpu: "2"
+        memory: 5Gi
+      requests:
+        cpu: "1"
+        memory: 5Gi
+
+
