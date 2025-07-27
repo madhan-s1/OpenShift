@@ -1,7 +1,0 @@
----
-# vars file for ocp_validation
-
-ocp_validation_openshift_host: https://api.strl-ocp-accp-1.accp.apptoapp.net:6443
-ocp_validation_openshift_admin_user: kubeadmin
-
-

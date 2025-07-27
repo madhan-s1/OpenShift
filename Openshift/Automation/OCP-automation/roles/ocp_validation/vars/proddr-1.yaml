@@ -1,7 +1,0 @@
----
-# vars file for ocp_gitops
-
-ocp_validation_openshift_host: https://api.strl-ocp-proddr-1.apptoapp.net:6443
-ocp_validation_openshift_admin_user: kubeadmin
-
-

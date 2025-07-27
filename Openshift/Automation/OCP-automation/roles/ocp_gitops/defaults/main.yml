@@ -1,7 +1,0 @@
----
-# defaults file for ocp_gitops
-
-ocp_gitops_admins_group: G-OCP-NPROD-CLUSTER-ADMINS
-ocp_gitops_worker_hp_hugepages: "16Gi"
-
-
