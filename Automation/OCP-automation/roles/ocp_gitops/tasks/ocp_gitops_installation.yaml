@@ -1,0 +1,118 @@
+---
+# tasks file for ocp_gitops
+
+- name: ocp_gitops | ocp_gitops_installation.yaml | Create Openshift-Gitops operator
+  kubernetes.core.k8s:
+    host: "{{ ocp_gitops_openshift_host }}"
+    validate_certs: no
+    state: present
+    definition:
+      apiVersion: operators.coreos.com/v1alpha1
+      kind: Subscription
+      metadata:
+        name: openshift-gitops-operator
+        namespace: gitops-operator
+      spec:
+        channel: latest
+        installPlanApproval: Automatic
+        name: openshift-gitops-operator
+        source: redhat-operators
+        sourceNamespace: openshift-marketplace
+
+- name: ocp_gitops | ocp_gitops_installation.yaml | Wait till Openshift-Gitops Application Controller is created
+  kubernetes.core.k8s_info:
+    host: "{{ ocp_gitops_openshift_host }}"
+    validate_certs: no
+    kind: Pod
+    label_selectors:
+      - app.kubernetes.io/name=openshift-gitops-application-controller
+    namespace: openshift-gitops
+    wait: yes
+    wait_sleep: 10
+    wait_timeout: 360
+
+- name: ocp_gitops | ocp_gitops_installation.yaml | Wait till Openshift-Gitops Applicationset Controller is created
+  kubernetes.core.k8s_info:
+    host: "{{ ocp_gitops_openshift_host }}"
+    validate_certs: no
+    kind: Pod
+    label_selectors:
+      - app.kubernetes.io/name=openshift-gitops-applicationset-controller
+    namespace: openshift-gitops
+    wait: yes
+    wait_sleep: 10
+    wait_timeout: 360
+
+- name: ocp_gitops | ocp_gitops_installation.yaml | Wait till Openshift-Gitops Dex server is created
+  kubernetes.core.k8s_info:
+    host: "{{ ocp_gitops_openshift_host }}"
+    validate_certs: no
+    kind: Pod
+    label_selectors:
+      - app.kubernetes.io/name=openshift-gitops-dex-server
+    namespace: openshift-gitops
+    wait: yes
+    wait_sleep: 10
+    wait_timeout: 360
+
+- name: ocp_gitops | ocp_gitops_installation.yaml | Wait till Openshift-Gitops Redis is created
+  kubernetes.core.k8s_info:
+    host: "{{ ocp_gitops_openshift_host }}"
+    validate_certs: no
+    kind: Pod
+    label_selectors:
+      - app.kubernetes.io/name=openshift-gitops-redis
+    namespace: openshift-gitops
+    wait: yes
+    wait_sleep: 10
+    wait_timeout: 360
+
+- name: ocp_gitops | ocp_gitops_installation.yaml | Wait till Openshift-Gitops Repo server is created
+  kubernetes.core.k8s_info:
+    host: "{{ ocp_gitops_openshift_host }}"
+    validate_certs: no
+    kind: Pod
+    label_selectors:
+      - app.kubernetes.io/name=openshift-gitops-repo-server
+    namespace: openshift-gitops
+    wait: yes
+    wait_sleep: 10
+    wait_timeout: 360
+
+- name: ocp_gitops | ocp_gitops_installation.yaml | Wait till Openshift-Gitops Server is created
+  kubernetes.core.k8s_info:
+    host: "{{ ocp_gitops_openshift_host }}"
+    validate_certs: no
+    kind: Pod
+    label_selectors:
+      - app.kubernetes.io/name=openshift-gitops-server
+    namespace: openshift-gitops
+    wait: yes
+    wait_sleep: 10
+    wait_timeout: 360
+
+- name: ocp_gitops | ocp_gitops_installation.yaml | Wait till Openshift-Gitops Cluster is created
+  kubernetes.core.k8s_info:
+    host: "{{ ocp_gitops_openshift_host }}"
+    validate_certs: no
+    kind: Pod
+    label_selectors:
+      - app.kubernetes.io/name=cluster
+    namespace: openshift-gitops
+    wait: yes
+    wait_sleep: 10
+    wait_timeout: 360
+
+- name: ocp_gitops | ocp_gitops_installation.yaml | Wait till Openshift-Gitops Kam is created
+  kubernetes.core.k8s_info:
+    host: "{{ ocp_gitops_openshift_host }}"
+    validate_certs: no
+    kind: Pod
+    label_selectors:
+      - app.kubernetes.io/name=kam
+    namespace: openshift-gitops
+    wait: yes
+    wait_sleep: 10
+    wait_timeout: 360
+
+

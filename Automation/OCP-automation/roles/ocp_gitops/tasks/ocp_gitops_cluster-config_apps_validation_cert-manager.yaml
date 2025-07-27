@@ -1,0 +1,117 @@
+---
+# tasks file for ocp_gitops
+
+- name: ocp_gitops | ocp_gitops_cluster-config_apps_validation_cert-manager.yaml | Openshift Gitops - Get cert-manager application status
+  kubernetes.core.k8s_info:
+    host: "{{ ocp_gitops_openshift_host }}"
+    validate_certs: no
+    api_version: argoproj.io/v1alpha1
+    kind: Application
+    name: config-cert-manager
+    namespace: openshift-gitops
+  register: ocp_gitops_application_status
+  until: ocp_gitops_application_status.resources[0].status.health.status is defined
+  retries: 10
+  delay: 5
+
+- name: ocp_gitops | ocp_gitops_cluster-config_apps_validation_cert-manager.yaml | Openshift Gitops - Wait 30sec before checking cert-manager application status
+  ansible.builtin.pause:
+    seconds: 30
+
+- name: ocp_gitops | ocp_gitops_cluster-config_apps_validation_customcerts.yaml | Openshift Gitops - Wait till cert-manager pod is running
+  kubernetes.core.k8s_info:
+    host: "{{ ocp_gitops_openshift_host }}"
+    validate_certs: no
+    kind: Pod
+    label_selectors:
+      - app=cert-manager
+    namespace: cert-manager
+    wait: yes
+    wait_sleep: 10
+    wait_timeout: 360
+  register: ocp_gitops_pod_status
+  until:
+    - ocp_gitops_pod_status.resources[0].status.phase == "Running"
+  retries: 10
+  delay: 10
+
+- name: ocp_gitops | ocp_gitops_cluster-config_apps_validation_customcerts.yaml | Openshift Gitops - Wait till trust-manager pod is running
+  kubernetes.core.k8s_info:
+    host: "{{ ocp_gitops_openshift_host }}"
+    validate_certs: no
+    kind: Pod
+    label_selectors:
+      - app=trust-manager
+    namespace: openshift-gitops
+    wait: yes
+    wait_sleep: 10
+    wait_timeout: 360
+  register: ocp_gitops_pod_status
+  until:
+    - ocp_gitops_pod_status.resources[0].status.phase == "Running"
+  retries: 10
+  delay: 10
+
+- name: ocp_gitops | ocp_gitops_cluster-config_apps_validation_cert-manager.yaml | Openshift Gitops - Add label to enable cluster monitoring for cert-manager application
+  kubernetes.core.k8s:
+    host: "{{ ocp_gitops_openshift_host }}"
+    validate_certs: no
+    state: patched
+    kind: Namespace
+    name: cert-manager
+    definition:
+      metadata:
+        labels:
+          openshift.io/cluster-monitoring: "true"
+
+- name: ocp_gitops | ocp_gitops_cluster-config_apps_validation_cert-manager.yaml | Openshift Gitops - Add flag to set certificate resource as owner of the certificate secret
+  kubernetes.core.k8s:
+    host: "{{ ocp_gitops_openshift_host }}"
+    validate_certs: no
+    state: patched
+    api_version: operator.openshift.io/v1alpha1
+    kind: CertManager
+    name: cluster
+    definition:
+      spec:
+        controllerConfig:
+          overrideArgs:
+            - '--enable-certificate-owner-ref'
+
+- name: ocp_gitops | ocp_gitops_cluster-config_apps_validation_customcerts.yaml | Openshift Gitops - Wait till cert-manager pod is running post patching
+  kubernetes.core.k8s_info:
+    host: "{{ ocp_gitops_openshift_host }}"
+    validate_certs: no
+    kind: Pod
+    label_selectors:
+      - app=cert-manager
+    namespace: cert-manager
+    wait: yes
+    wait_sleep: 10
+    wait_timeout: 60
+  register: ocp_gitops_pod_status
+  until:
+    - ocp_gitops_pod_status.resources[0].status.phase == "Running"
+  retries: 10
+  delay: 5
+
+- name: ocp_gitops | ocp_gitops_cluster-config_apps_validation_cert-manager.yaml | Openshift Gitops - Get cert-manager application status
+  kubernetes.core.k8s_info:
+    host: "{{ ocp_gitops_openshift_host }}"
+    validate_certs: no
+    api_version: argoproj.io/v1alpha1
+    kind: Application
+    name: config-cert-manager
+    namespace: openshift-gitops
+  register: ocp_gitops_application_status
+  until: ocp_gitops_application_status.resources[0].status.health.status == "Healthy"
+  retries: 10
+  delay: 10
+
+- name: ocp_gitops | ocp_gitops_cluster-config_apps_validation_cert-manager.yaml | Openshift Gitops - Check cert-manager application status
+  ansible.builtin.assert:
+    that:
+      - ocp_gitops_application_status.resources[0].status.health.status == "Healthy"
+    fail_msg: "cert-manager application not Healthy"
+    success_msg: "cert-manager application Healthy"
+

@@ -1,0 +1,79 @@
+---
+# tasks file for ocp_gitops
+
+- name: ocp_gitops | ocp_gitops_cluster-config_apps_validation_logging.yaml | Openshift Gitops - Wait till Logging application is created
+  kubernetes.core.k8s_info:
+    host: "{{ ocp_gitops_openshift_host }}"
+    validate_certs: no
+    api_version: argoproj.io/v1alpha1
+    kind: Application
+    name: config-logging
+    namespace: openshift-gitops
+    validate_certs: no
+  register: ocp_gitops_application_status
+  until: ocp_gitops_application_status.resources[0].status.health.status is defined
+  retries: 3
+  delay: 5
+
+- name: ocp_gitops | ocp_gitops_cluster-config_apps_validation_logging.yaml | Openshift Gitops - Wait 30sec before checking Logging application status
+  ansible.builtin.pause:
+    seconds: 30
+
+- name: ocp_gitops | ocp_gitops_cluster-config_apps_validation_logging.yaml | Openshift Gitops - Get Logging application status
+  kubernetes.core.k8s_info:
+    host: "{{ ocp_gitops_openshift_host }}"
+    validate_certs: no
+    api_version: argoproj.io/v1alpha1
+    kind: Application
+    name: config-logging
+    namespace: openshift-gitops
+    validate_certs: no
+  register: ocp_gitops_application_status
+  until: ocp_gitops_application_status.resources[0].status.health.status == "Healthy"
+  retries: 6
+  delay: 10
+
+- name: ocp_gitops | ocp_gitops_cluster-config_apps_validation_logging.yaml | Openshift Gitops - Check Logging application status
+  ansible.builtin.assert:
+    that:
+      - ocp_gitops_application_status.resources[0].status.health.status == "Healthy"
+    fail_msg: "Logging application not Healthy"
+    success_msg: "Logging application Healthy"
+
+#- name: ocp_gitops | ocp_gitops_cluster-config_apps_validation_logging.yaml | Openshift Gitops - Wait till Logging pods are running on infra nodes
+#  kubernetes.core.k8s_info:
+#    host: "{{ ocp_gitops_openshift_host }}"
+#    validate_certs: no
+#    kind: Pod
+#    label_selectors:
+#      - component=elasticsearch
+#    namespace: openshift-logging
+#    wait: yes
+#    wait_sleep: 10
+#    wait_timeout: 360
+#  register: ocp_gitops_pod_status
+#  until:
+#    - ocp_gitops_pod_status.resources[0].spec.nodeName is search ('infra')
+#    - ocp_gitops_pod_status.resources[1].spec.nodeName is search ('infra')
+#    - ocp_gitops_pod_status.resources[2].spec.nodeName is search ('infra')
+#  retries: 15
+#  delay: 10
+
+- name: ocp_gitops | ocp_gitops_cluster-config_apps_validation_logging.yaml | Openshift Gitops - Wait till Kibana pod is running on infra nodes
+  kubernetes.core.k8s_info:
+    host: "{{ ocp_gitops_openshift_host }}"
+    validate_certs: no
+    kind: Pod
+    label_selectors:
+      - component=kibana
+    namespace: openshift-logging
+    wait: yes
+    wait_sleep: 10
+    wait_timeout: 360
+  register: ocp_gitops_pod_status
+  until:
+    - ocp_gitops_pod_status.resources[0].spec.nodeName is search ('infra')
+  retries: 12
+  delay: 10
+
+

@@ -1,0 +1,45 @@
+---
+- name: ocp_validation | ocp_validation_co.yaml | ClusterOperator "{{ item }}"
+  kubernetes.core.k8s_info:
+    host: "{{ ocp_validation_openshift_host }}"
+    validate_certs: no
+    api_version: v1
+    kind: ClusterOperator
+    name: "{{ item }}"
+    validate_certs: no
+  register: ocp_validation_cluster_operator_status
+
+#- name: ocp_validation | ocp_validation_co.yaml | ClusterOperator "{{ item }}" Degraded
+#  when: 
+#    - item_cond.type == "Degraded" 
+#    - item_cond.status == "True"
+#  ansible.builtin.debug:
+#    msg:  ClusterOperator "{{ item }}" Degraded
+#  loop: "{{ cluster_operator_status.resources[0].status.conditions }}"
+#  loop_control:
+#    loop_var: item_cond
+
+#- name:  ocp_validation | ocp_validation_co.yaml | ClusterOperator "{{ item }}" Degraded fail
+#  when:
+#    - item_cond.type == "Degraded"
+#    - item_cond.status == "True"
+#  ansible.builtin.fail:
+#    msg:
+#      - One or more ClusterOperator are in Degraded status, see output below:
+#      - "{{ ocp_validation_co_status.stdout }}"
+#  loop: "{{ ocp_validation_cluster_operator_status.resources[0].status.conditions }}"
+#  loop_control:
+#    loop_var: item_cond
+
+- name: ocp_validation | ocp_validation_co.yaml | Check ClusterOperator "{{ item }}" status
+  when: item_cond.type == "Degraded"
+  ansible.builtin.assert:
+    that:
+      - item_cond.status == "False"
+    fail_msg: "{{ item }} cluster operator Degraded"
+    success_msg: "{{ item }} cluster operator Healthy"
+  loop: "{{ ocp_validation_cluster_operator_status.resources[0].status.conditions }}"
+  loop_control:
+    loop_var: item_cond
+
+

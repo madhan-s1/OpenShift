@@ -1,0 +1,93 @@
+---
+# tasks file for ocp_gitops
+- name: ocp_gitops | ocp_gitops_cluster-config_apps_validation_windows-machineconfig-operator.yaml | Openshift Gitops - configure the OVN-Kubernetes hybrid network overlay for windows-machineconfig-operator application
+  kubernetes.core.k8s:
+    host: "{{ ocp_gitops_openshift_host }}"
+    validate_certs: no
+    state: patched
+    api_version: operator.openshift.io/v1
+    kind: Network
+    name: cluster
+    definition:
+      spec:
+        defaultNetwork:
+          ovnKubernetesConfig:
+            hybridOverlayConfig:
+              hybridClusterNetwork:
+              - cidr: "10.132.0.0/14"
+                hostPrefix: 23
+              hybridOverlayVXLANPort: 9898
+
+# - name: ocp_gitops | ocp_gitops_cluster-config_apps_validation_windows-machineconfig-operator.yaml | Openshift Gitops - Get windows-machineconfig-operator application status
+#   kubernetes.core.k8s_info:
+#     host: "{{ ocp_gitops_openshift_host }}"
+#     validate_certs: no
+#     api_version: argoproj.io/v1alpha1
+#     kind: Application
+#     name: config-windows-machineconfig-operator
+#     namespace: openshift-gitops
+#   register: ocp_gitops_application_status
+#   until: ocp_gitops_application_status.resources[0].status.health.status is defined
+#   retries: 10
+#   delay: 5
+
+# - name: ocp_gitops | ocp_gitops_cluster-config_apps_validation_windows-machineconfig-operator.yaml | Openshift Gitops - Wait 30sec before checking windows-machineconfig-operator application status
+#   ansible.builtin.pause:
+#     seconds: 30
+
+# - name: ocp_gitops | ocp_gitops_cluster-config_apps_validation_customcerts.yaml | Openshift Gitops - Wait till windows-machineconfig-operator pod is running
+#   kubernetes.core.k8s_info:
+#     host: "{{ ocp_gitops_openshift_host }}"
+#     validate_certs: no
+#     kind: Pod
+#     label_selectors:
+#       - app=windows-machineconfig-operator
+#     namespace: windows-machineconfig-operator
+#     wait: yes
+#     wait_sleep: 10
+#     wait_timeout: 360
+#   register: ocp_gitops_pod_status
+#   until:
+#     - ocp_gitops_pod_status.resources[0].status.phase == "Running"
+#   retries: 10
+#   delay: 10
+
+# - name: ocp_gitops | ocp_gitops_cluster-config_apps_validation_customcerts.yaml | Openshift Gitops - Wait till trust-manager pod is running
+#   kubernetes.core.k8s_info:
+#     host: "{{ ocp_gitops_openshift_host }}"
+#     validate_certs: no
+#     kind: Pod
+#     label_selectors:
+#       - app=trust-manager
+#     namespace: openshift-gitops
+#     wait: yes
+#     wait_sleep: 10
+#     wait_timeout: 360
+#   register: ocp_gitops_pod_status
+#   until:
+#     - ocp_gitops_pod_status.resources[0].status.phase == "Running"
+#   retries: 10
+#   delay: 10
+
+
+
+# - name: ocp_gitops | ocp_gitops_cluster-config_apps_validation_windows-machineconfig-operator.yaml | Openshift Gitops - Get windows-machineconfig-operator application status
+#   kubernetes.core.k8s_info:
+#     host: "{{ ocp_gitops_openshift_host }}"
+#     validate_certs: no
+#     api_version: argoproj.io/v1alpha1
+#     kind: Application
+#     name: config-windows-machineconfig-operator
+#     namespace: openshift-gitops
+#   register: ocp_gitops_application_status
+#   until: ocp_gitops_application_status.resources[0].status.health.status == "Healthy"
+#   retries: 10
+#   delay: 10
+
+# - name: ocp_gitops | ocp_gitops_cluster-config_apps_validation_windows-machineconfig-operator.yaml | Openshift Gitops - Check windows-machineconfig-operator application status
+#   ansible.builtin.assert:
+#     that:
+#       - ocp_gitops_application_status.resources[0].status.health.status == "Healthy"
+#     fail_msg: "windows-machineconfig-operator application not Healthy"
+#     success_msg: "windows-machineconfig-operator application Healthy"
+

@@ -1,0 +1,41 @@
+---
+# tasks file for ocp_gitops
+
+- name: ocp_gitops | ocp_gitops_cluster-config_apps_validation_machineconfigs.yaml | Openshift Gitops - Get machineconfigs application status
+  kubernetes.core.k8s_info:
+    host: "{{ ocp_gitops_openshift_host }}"
+    validate_certs: no
+    api_version: argoproj.io/v1alpha1
+    kind: Application
+    name: config-machineconfigs
+    namespace: openshift-gitops
+  register: ocp_gitops_application_status
+  until: ocp_gitops_application_status.resources[0].status.health.status is defined
+  retries: 3
+  delay: 5
+
+- name: ocp_gitops | ocp_gitops_cluster-config_apps_validation_machineconfigs.yaml | Openshift Gitops - Wait 10sec before checking machineconfigs application status
+  ansible.builtin.pause:
+    seconds: 10
+
+- name: ocp_gitops | ocp_gitops_cluster-config_apps_validation_machineconfigs.yaml | Openshift Gitops - Get machineconfigs application status
+  kubernetes.core.k8s_info:
+    host: "{{ ocp_gitops_openshift_host }}"
+    validate_certs: no
+    api_version: argoproj.io/v1alpha1
+    kind: Application
+    name: config-machineconfigs
+    namespace: openshift-gitops
+  register: ocp_gitops_application_status
+  until: ocp_gitops_application_status.resources[0].status.health.status == "Healthy"
+  retries: 6
+  delay: 10
+
+- name: ocp_gitops | ocp_gitops_cluster-config_apps_validation_machineconfigs.yaml | Openshift Gitops - Check machineconfigs application status
+  ansible.builtin.assert:
+    that:
+      - ocp_gitops_application_status.resources[0].status.health.status == "Healthy"
+    fail_msg: "machineconfigs application not Healthy"
+    success_msg: "machineconfigs application Healthy"
+
+
